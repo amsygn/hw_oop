@@ -8,7 +8,7 @@ class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
         self.description = description
-        self.price = price
+        self.price = float(price)
         self.quantity = quantity
 
 
@@ -80,7 +80,8 @@ if __name__ == "__main__":
     print(product3.quantity)
 
     category1 = Category("Смартфоны",
-                         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
+                         "Смартфоны, как средство не только коммуникации, но и получения "
+                         "дополнительных функций для удобства жизни",
                          [product1, product2, product3])
 
     print(category1.name == "Смартфоны")
@@ -91,7 +92,8 @@ if __name__ == "__main__":
 
     product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
     category2 = Category("Телевизоры",
-                         "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
+                         "Современный телевизор, который позволяет наслаждаться просмотром, "
+                         "станет вашим другом и помощником",
                          [product4])
 
     print(category2.name)
@@ -104,5 +106,6 @@ if __name__ == "__main__":
 
     # Пример загрузки из JSON
     categories = load_categories_from_json('data/products.json')
+    print("\nКатегории и продукты из внешнего файла:")
     for cat in categories:
-        print(f"Категория: {cat.name}, Товаров: {len(cat.products)}")
+        print(f"Категория: {cat.name}, товаров: {len(cat.products)}")
