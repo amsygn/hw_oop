@@ -437,7 +437,3 @@ def test_4_category_count():
     Category("Cat3", "Desc3", [p])
 
     assert Category.category_count == 3
-
-
-# if __name__ == "__main__":
-#     pytest.main([__file__, "-v", "--tb=short"])
