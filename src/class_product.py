@@ -1,7 +1,3 @@
-import json
-from typing import List
-
-
 class Product:
     """Класс, представляющий продукт."""
 
@@ -10,4 +6,3 @@ class Product:
         self.description = description
         self.price = float(price)
         self.quantity = quantity
-
