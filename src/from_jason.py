@@ -1,5 +1,9 @@
 import json
 
+from typing import List
+
+from main import Category, Product
+
 def load_categories_from_json(file_path: str) -> List[Category]:
     """Доп.задание: загружает данные из JSON файла и создает объекты Category и Product."""
     with open(file_path, 'r', encoding='utf-8') as file:
