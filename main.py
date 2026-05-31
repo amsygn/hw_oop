@@ -1,6 +1,6 @@
 from src.class_category import Category
 from src.class_product import Product
-from src.from_jason import load_categories_from_json
+# from src.from_jason import load_categories_from_json
 
 
 # Товары из задания
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     print(Category.product_count)
 
     # Пример загрузки из JSON
-    categories = load_categories_from_json('data/products.json')
-    print("\nКатегории и продукты из внешнего файла:")
-    for cat in categories:
-        print(f"Категория: {cat.name}, товаров: {len(cat.products)}")
+    # categories = load_categories_from_json('data/products.json')
+    # print("\nКатегории и продукты из внешнего файла:")
+    # for cat in categories:
+    #     print(f"Категория: {cat.name}, товаров: {len(cat.products)}")
