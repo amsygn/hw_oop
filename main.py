@@ -1,29 +1,6 @@
-import json
-from typing import List
-
-
-class Product:
-    """Класс, представляющий продукт."""
-
-    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-        self.name = name
-        self.description = description
-        self.price = float(price)
-        self.quantity = quantity
-
-
-class Category:
-
-    category_count: int = 0  # Общее количество категорий
-    product_count: int = 0  # Общее количество товаров (уникальных продуктов)
-
-    def __init__(self, name: str, description: str, products: List[Product]) -> None:
-        self.name = name
-        self.description = description
-        self.products = products
-
-        Category.category_count += 1
-        Category.product_count += len(products)
+from src.class_category import Category
+from src.class_product import Product
+from src.from_jason import load_categories_from_json
 
 
 # Товары из задания

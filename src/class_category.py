@@ -1,4 +1,5 @@
 from typing import List
+from src.class_product import Product
 
 
 class Category:
