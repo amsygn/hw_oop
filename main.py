@@ -53,7 +53,7 @@ if __name__ == "__main__":
     print(Category.category_count)
     print(Category.product_count)
 
-    # Пример загрузки из JSON
+    # Загрузка из JSON (дополнительное задание)
     categories = load_categories_from_json('data/products.json')
     print("\nКатегории и продукты из внешнего файла:")
     for cat in categories:
