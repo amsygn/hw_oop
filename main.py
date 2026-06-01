@@ -1,5 +1,5 @@
-from src.class_category import Category
-from src.class_product import Product
+# from src.class_category import Category
+# from src.class_product import Product
 from src.from_jason import load_categories_from_json
 
 
@@ -12,7 +12,7 @@ from src.from_jason import load_categories_from_json
 #
 #
 if __name__ == "__main__":
-#
+
 #     print(product1.name)
 #     print(product1.description)
 #     print(product1.price)
