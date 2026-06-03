@@ -57,58 +57,76 @@ class TestProduct:
         assert product.price == 450.0
         assert product.quantity == 8
 
-    # ========== НОВЫЕ ТЕСТЫ ДЛЯ ЗАДАНИЯ 4 (геттер/сеттер цены) ==========
+    # Тесты для задания 1 (add_product)
 
-    def test_product_price_getter(self):
-        """Тест геттера цены"""
-        product = Product("Test", "Desc", 100.0, 5)
-        assert product.price == 100.0
+    def test_add_product_to_category(self):
+        """Тест добавления продукта в категорию через add_product"""
+        product1 = Product("Product A", "Desc A", 100.0, 5)
+        category = Category("Electronics", "Devices", [product1])
 
-    def test_product_price_setter_invalid_negative(self, capsys):
-        """Тест сеттера цены с отрицательным значением"""
-        product = Product("Test", "Desc", 100.0, 5)
+        product2 = Product("Product B", "Desc B", 200.0, 3)
+        category.add_product(product2)
 
-        product.price = -50
-        captured = capsys.readouterr()
-        assert "Цена не должна быть нулевая или отрицательная" in captured.out
-        assert product.price == 100.0  # Цена не изменилась
+        products_list = category.get_products_list()
+        assert len(products_list) == 2
+        assert products_list[1] is product2
 
-    def test_product_price_setter_invalid_zero(self, capsys):
-        """Тест сеттера цены с нулевым значением"""
-        product = Product("Test", "Desc", 100.0, 5)
+    def test_add_product_increments_product_count(self):
+        """Тест увеличения счетчика продуктов при добавлении"""
+        product1 = Product("P1", "D1", 100.0, 5)
+        category = Category("Cat1", "Desc1", [product1])
 
-        product.price = 0
-        captured = capsys.readouterr()
-        assert "Цена не должна быть нулевая или отрицательная" in captured.out
-        assert product.price == 100.0  # Цена не изменилась
+        assert Category.product_count == 1
 
-    def test_product_price_setter_valid_increase(self):
-        """Тест сеттера цены с увеличением цены"""
-        product = Product("Test", "Desc", 100.0, 5)
-        product.price = 150.0
-        assert product.price == 150.0
+        product2 = Product("P2", "D2", 200.0, 3)
+        category.add_product(product2)
 
-    def test_product_price_setter_valid_decrease_with_confirmation(self, monkeypatch):
-        """Тест сеттера цены с понижением цены и подтверждением (y)"""
-        product = Product("Test", "Desc", 100.0, 5)
+        assert Category.product_count == 2
 
-        # Мокируем ввод пользователя
-        monkeypatch.setattr('builtins.input', lambda _: 'y')
+    def test_add_multiple_products_to_category(self):
+        """Тест добавления нескольких продуктов в категорию"""
+        category = Category("Empty", "No products", [])
 
-        product.price = 80.0
-        assert product.price == 80.0
+        for i in range(5):
+            product = Product(f"P{i}", f"D{i}", 100.0, i)
+            category.add_product(product)
 
-    def test_product_price_setter_valid_decrease_with_cancellation(self, monkeypatch):
-        """Тест сеттера цены с понижением цены и отменой (n)"""
-        product = Product("Test", "Desc", 100.0, 5)
+        products_list = category.get_products_list()
+        assert len(products_list) == 5
+        assert Category.product_count == 5
 
-        # Мокируем ввод пользователя
-        monkeypatch.setattr('builtins.input', lambda _: 'n')
+    # Тесты для задания 2 (геттер products)
 
-        product.price = 80.0
-        assert product.price == 100.0  # Цена не изменилась
+    def test_category_products_getter_format(self):
+        """Тест геттера products - проверка формата вывода"""
+        product1 = Product("Phone", "Smartphone", 500.0, 10)
+        product2 = Product("Laptop", "Computer", 1500.0, 5)
 
-    # ========== НОВЫЕ ТЕСТЫ ДЛЯ ЗАДАНИЯ 3 (new_product) ==========
+        category = Category("Electronics", "Devices", [product1, product2])
+
+        products_str = category.products
+        assert "Phone, 500.0 руб. Остаток: 10 шт." in products_str
+        assert "Laptop, 1500.0 руб. Остаток: 5 шт." in products_str
+
+    def test_category_products_getter_empty(self):
+        """Тест геттера products для пустой категории"""
+        category = Category("Empty", "No products", [])
+        assert category.products == "В категории нет товаров"
+
+    def test_category_products_getter_after_add_product(self):
+        """Тест геттера products после добавления продукта"""
+        product1 = Product("Phone", "Smartphone", 500.0, 10)
+        category = Category("Electronics", "Devices", [product1])
+
+        assert "Phone, 500.0 руб. Остаток: 10 шт." in category.products
+
+        product2 = Product("Tablet", "iPad", 800.0, 8)
+        category.add_product(product2)
+
+        assert "Tablet, 800.0 руб. Остаток: 8 шт." in category.products
+
+    # Тесты для задания 3 (new_product)
+
 
     def test_new_product_without_existing_products(self):
         """Тест new_product без проверки существующих продуктов"""
@@ -201,6 +219,56 @@ class TestProduct:
         assert result.quantity == 17  # 10 + 7
         assert result.price == 950.0
 
+    # Тесты для задания 4 (геттер/сеттер цены)
+
+
+    def test_product_price_getter(self):
+        """Тест геттера цены"""
+        product = Product("Test", "Desc", 100.0, 5)
+        assert product.price == 100.0
+
+    def test_product_price_setter_invalid_negative(self, capsys):
+        """Тест сеттера цены с отрицательным значением"""
+        product = Product("Test", "Desc", 100.0, 5)
+
+        product.price = -50
+        captured = capsys.readouterr()
+        assert "Цена не должна быть нулевая или отрицательная" in captured.out
+        assert product.price == 100.0  # Цена не изменилась
+
+    def test_product_price_setter_invalid_zero(self, capsys):
+        """Тест сеттера цены с нулевым значением"""
+        product = Product("Test", "Desc", 100.0, 5)
+
+        product.price = 0
+        captured = capsys.readouterr()
+        assert "Цена не должна быть нулевая или отрицательная" in captured.out
+        assert product.price == 100.0  # Цена не изменилась
+
+    def test_product_price_setter_valid_increase(self):
+        """Тест сеттера цены с увеличением цены"""
+        product = Product("Test", "Desc", 100.0, 5)
+        product.price = 150.0
+        assert product.price == 150.0
+
+    def test_product_price_setter_valid_decrease_with_confirmation(self, monkeypatch):
+        """Тест сеттера цены с понижением цены и подтверждением (y)"""
+        product = Product("Test", "Desc", 100.0, 5)
+
+        monkeypatch.setattr('builtins.input', lambda _: 'y')
+
+        product.price = 80.0
+        assert product.price == 80.0
+
+    def test_product_price_setter_valid_decrease_with_cancellation(self, monkeypatch):
+        """Тест сеттера цены с понижением цены и отменой (n)"""
+        product = Product("Test", "Desc", 100.0, 5)
+
+        monkeypatch.setattr('builtins.input', lambda _: 'n')
+
+        product.price = 80.0
+        assert product.price == 100.0  # Цена не изменилась
+
 
 class TestCategory:
     """Полные тесты для класса Category"""
@@ -252,75 +320,8 @@ class TestCategory:
         assert Category.category_count == 3
         assert Category.product_count == 6
 
-    # ========== НОВЫЕ ТЕСТЫ ДЛЯ ЗАДАНИЯ 1 (add_product) ==========
+    # Тесты приватности
 
-    def test_add_product_to_category(self):
-        """Тест добавления продукта в категорию через add_product"""
-        product1 = Product("Product A", "Desc A", 100.0, 5)
-        category = Category("Electronics", "Devices", [product1])
-
-        product2 = Product("Product B", "Desc B", 200.0, 3)
-        category.add_product(product2)
-
-        products_list = category.get_products_list()
-        assert len(products_list) == 2
-        assert products_list[1] is product2
-
-    def test_add_product_increments_product_count(self):
-        """Тест увеличения счетчика продуктов при добавлении"""
-        product1 = Product("P1", "D1", 100.0, 5)
-        category = Category("Cat1", "Desc1", [product1])
-
-        assert Category.product_count == 1
-
-        product2 = Product("P2", "D2", 200.0, 3)
-        category.add_product(product2)
-
-        assert Category.product_count == 2
-
-    def test_add_multiple_products_to_category(self):
-        """Тест добавления нескольких продуктов в категорию"""
-        category = Category("Empty", "No products", [])
-
-        for i in range(5):
-            product = Product(f"P{i}", f"D{i}", 100.0, i)
-            category.add_product(product)
-
-        products_list = category.get_products_list()
-        assert len(products_list) == 5
-        assert Category.product_count == 5
-
-    # ========== НОВЫЕ ТЕСТЫ ДЛЯ ЗАДАНИЯ 2 (геттер products) ==========
-
-    def test_category_products_getter_format(self):
-        """Тест геттера products - проверка формата вывода"""
-        product1 = Product("Phone", "Smartphone", 500.0, 10)
-        product2 = Product("Laptop", "Computer", 1500.0, 5)
-
-        category = Category("Electronics", "Devices", [product1, product2])
-
-        products_str = category.products
-        assert "Phone, 500.0 руб. Остаток: 10 шт." in products_str
-        assert "Laptop, 1500.0 руб. Остаток: 5 шт." in products_str
-
-    def test_category_products_getter_empty(self):
-        """Тест геттера products для пустой категории"""
-        category = Category("Empty", "No products", [])
-        assert category.products == "В категории нет товаров"
-
-    def test_category_products_getter_after_add_product(self):
-        """Тест геттера products после добавления продукта"""
-        product1 = Product("Phone", "Smartphone", 500.0, 10)
-        category = Category("Electronics", "Devices", [product1])
-
-        assert "Phone, 500.0 руб. Остаток: 10 шт." in category.products
-
-        product2 = Product("Tablet", "iPad", 800.0, 8)
-        category.add_product(product2)
-
-        assert "Tablet, 800.0 руб. Остаток: 8 шт." in category.products
-
-    # ========== ТЕСТЫ ПРИВАТНОСТИ ==========
 
     def test_products_private_attribute(self):
         """Тест: атрибут products должен быть приватным"""
@@ -565,27 +566,21 @@ class TestIntegration:
 
     def test_full_workflow(self):
         """Тест полного рабочего процесса"""
-        # Создаем продукты
         phone = Product("iPhone", "Smartphone", 1000.0, 10)
         laptop = Product("MacBook", "Laptop", 2000.0, 5)
         tablet = Product("iPad", "Tablet", 500.0, 8)
 
-        # Создаем категории
         electronics = Category("Electronics", "Devices", [phone, laptop])
         accessories = Category("Accessories", "Add-ons", [tablet])
 
-        # Проверяем счетчики
         assert Category.category_count == 2
         assert Category.product_count == 3
 
-        # Проверяем геттер
         assert "iPhone, 1000.0 руб. Остаток: 10 шт." in electronics.products
 
-        # Добавляем продукт
         electronics.add_product(tablet)
         assert Category.product_count == 4
 
-        # Создаем еще одну категорию через new_product
         existing_products = [phone, laptop, tablet]
         new_phone_data = {
             "name": "iPhone",
@@ -601,11 +596,9 @@ class TestIntegration:
 
     def test_new_product_with_add_product_integration(self):
         """Интеграционный тест: new_product и add_product вместе"""
-        # Создаем категорию с продуктом
         existing_product = Product("Laptop", "Gaming", 1500.0, 3)
         category = Category("Computers", "Devices", [existing_product])
 
-        # Пытаемся добавить такой же продукт через new_product
         product_data = {
             "name": "Laptop",
             "description": "Gaming",
@@ -615,11 +608,9 @@ class TestIntegration:
 
         result = Product.new_product(product_data, category.get_products_list())
 
-        # Проверяем, что продукт обновился
         assert result.quantity == 5
         assert result.price == 1600.0
 
-        # Проверяем, что в категории тот же объект
         category_products = category.get_products_list()
         assert category_products[0] is result
 
