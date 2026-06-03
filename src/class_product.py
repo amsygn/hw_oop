@@ -51,7 +51,8 @@ class Product:
                     existing_product.quantity += quantity
                     if price > existing_product.price:
                         existing_product.price = price
-                    print(f"Товар '{name}' уже существует. Количество обновлено до {existing_product.quantity}")
+                    print(f"Товар '{name}' уже существует. Количество обновлено до "
+                          f"{existing_product.quantity}")
                     return existing_product
 
         # Создаем новый продукт

@@ -2,12 +2,6 @@ import os
 import pytest
 import json
 import tempfile
-from unittest.mock import patch
-
-# Добавляем путь к корневой директории
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.class_product import Product
 from src.class_category import Category
