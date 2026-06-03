@@ -4,13 +4,13 @@ class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
         self.description = description
-        self._price = float(price)  # Приватный атрибут цены
+        self.__price = float(price)  # Приватный атрибут цены
         self.quantity = quantity
 
     @property
     def price(self) -> float:
         """Геттер для цены."""
-        return self._price
+        return self.__price
 
     @price.setter
     def price(self, value: float) -> None:
@@ -20,15 +20,15 @@ class Product:
             return
 
         # Дополнительное задание: подтверждение при понижении цены
-        if value < self._price:
-            user_input = input(f"Цена понижается с {self._price} до {value}. Вы согласны? (y/n): ")
+        if value < self.__price:
+            user_input = input(f"Цена понижается с {self.__price} до {value}. Вы согласны? (y/n): ")
             if user_input.lower() == 'y':
-                self._price = value
+                self.__price = value
                 print(f"Цена изменена на {value}")
             else:
                 print("Операция отменена")
         else:
-            self._price = value
+            self.__price = value
             print(f"Цена изменена на {value}")
 
     @classmethod
