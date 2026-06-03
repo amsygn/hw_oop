@@ -2,14 +2,12 @@ from src.class_category import Category
 from src.class_product import Product
 from src.from_jason import load_categories_from_json
 
-
 # Товары из задания
 product1 = Product(
     "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
 )
 product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
 product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
-
 
 if __name__ == "__main__":
 
@@ -35,7 +33,7 @@ if __name__ == "__main__":
 
     print(category1.name == "Смартфоны")
     print(category1.description)
-    print(len(category1.products))
+    print(category1.products)
     print(category1.category_count)
     print(category1.product_count)
 
@@ -47,8 +45,11 @@ if __name__ == "__main__":
 
     print(category2.name)
     print(category2.description)
-    print(len(category2.products))
-    print(category2.products[0].name)
+    print(category2.products)
+
+    products_list = category2.get_products_list()
+    if products_list:
+        print(products_list[0].name)
 
     print(Category.category_count)
     print(Category.product_count)
@@ -57,4 +58,4 @@ if __name__ == "__main__":
     categories = load_categories_from_json('data/products.json')
     print("\nКатегории и продукты из внешнего файла:")
     for cat in categories:
-        print(f"Категория: {cat.name}, товаров: {len(cat.products)}")
+        print(f"Категория: {cat.name}, товаров: {len(cat.get_products_list())}")
