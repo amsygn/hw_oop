@@ -1,29 +1,6 @@
-import json
-from typing import List
-
-
-class Product:
-    """Класс, представляющий продукт."""
-
-    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-        self.name = name
-        self.description = description
-        self.price = float(price)
-        self.quantity = quantity
-
-
-class Category:
-
-    category_count: int = 0  # Общее количество категорий
-    product_count: int = 0  # Общее количество товаров (уникальных продуктов)
-
-    def __init__(self, name: str, description: str, products: List[Product]) -> None:
-        self.name = name
-        self.description = description
-        self.products = products
-
-        Category.category_count += 1
-        Category.product_count += len(products)
+from src.class_category import Category
+from src.class_product import Product
+from src.from_jason import load_categories_from_json
 
 
 # Товары из задания
@@ -32,34 +9,6 @@ product1 = Product(
 )
 product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
 product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
-
-
-def load_categories_from_json(file_path: str) -> List[Category]:
-    """Доп.задание: загружает данные из JSON файла и создает объекты Category и Product."""
-    with open(file_path, 'r', encoding='utf-8') as file:
-        data = json.load(file)
-
-    categories: list[Category] = []
-
-    for category_data in data:
-        products = []
-        for product_data in category_data.get('products', []):
-            product = Product(
-                name=product_data['name'],
-                description=product_data['description'],
-                price=product_data['price'],
-                quantity=product_data['quantity']
-            )
-            products.append(product)
-
-        category = Category(
-            name=category_data['name'],
-            description=category_data['description'],
-            products=products
-        )
-        categories.append(category)
-
-    return categories
 
 
 if __name__ == "__main__":
@@ -104,7 +53,7 @@ if __name__ == "__main__":
     print(Category.category_count)
     print(Category.product_count)
 
-    # Пример загрузки из JSON
+    # Загрузка из JSON (дополнительное задание)
     categories = load_categories_from_json('data/products.json')
     print("\nКатегории и продукты из внешнего файла:")
     for cat in categories:
