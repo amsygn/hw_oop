@@ -9,7 +9,7 @@ if __name__ == '__main__':
     product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
     # Демонстрация __str__ для продуктов
-    print("~~~ Товары ~~~")
+    print("••• Товары •••")
     print(str(product1))
     print(str(product2))
     print(str(product3))
@@ -17,28 +17,29 @@ if __name__ == '__main__':
 
     category1 = Category(
         "Смартфоны",
-        "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
+        "Смартфоны, как средство не только коммуникации, но и получения дополнительных "
+        "функций для удобства жизни",
         [product1, product2, product3]
     )
 
     # Демонстрация __str__ для категории
-    print("~~~ Категория ~~~")
+    print("••• Категория •••")
     print(str(category1))
     print()
 
     # Демонстрация геттера products (использует __str__ продуктов)
-    print("~~~ Список товаров в категории ~~~")
+    print("••• Список товаров в категории •••")
     print(category1.products)
     print()
 
     # Демонстрация __add__ для продуктов
-    print("~~~ Общая стоимость товаров на складе ~~~")
+    print("••• Общая стоимость товаров на складе •••")
     print(f"{product1.name} + {product2.name} = {product1 + product2}")
     print(f"{product1.name} + {product3.name} = {product1 + product3}")
     print(f"{product2.name} + {product3.name} = {product2 + product3}")
     print()
 
-    print("~~~ Общая информация о категории ~~~")
+    print("••• Общая информация о категории •••")
     print(f'Категория:', category1.name)
     print(f'Описание:', category1.description)
     print(f'Товары в наличии:', category1.products)
@@ -52,7 +53,7 @@ if __name__ == '__main__':
                          "станет вашим другом и помощником",
                          [product4])
 
-    print("~~~ Новая категория ~~~")
+    print("••• Новая категория •••")
     print(f'Категория:', category2.name)
     print(f'Описание:', category2.description)
     print(f'Товары в наличии:', category2.products)
@@ -72,6 +73,6 @@ if __name__ == '__main__':
         print(f"Категория: {cat.name}, товаров: {len(cat.get_products_list())}")
 
     # Демонстрация итератора (дополнительное задание)
-    print("\n~~~ Итерация по товарам категории (дополнительное задание) ~~~")
+    print("\n••• Итерация по товарам категории (дополнительное задание) •••")
     for product in category1:
         print(f"  {product}")
