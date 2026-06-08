@@ -1,5 +1,5 @@
 from src.class_category import Category
-from src.class_product import Product
+from src.class_product import Product, Smartphone, LawnGrass
 from src.from_jason import load_categories_from_json
 
 if __name__ == '__main__':
@@ -66,13 +66,82 @@ if __name__ == '__main__':
     print(f'Всего категорий: ', Category.category_count)
     print(f'Всего товаров в наличии:', Category.product_count)
 
-    # Загрузка из JSON (дополнительное задание)
+    # Демонстрация новых классов-наследников (Задание 1)
+    print("\n" + "="*50)
+    print("••• Демонстрация новых классов-наследников •••")
+    print("="*50)
+
+    # Создание смартфонов
+    smartphone1 = Smartphone(
+        "Xiaomi 13 Pro", "Флагманский смартфон", 89990.0, 15,
+        "высокая", "13 Pro", 512, "черный"
+    )
+    smartphone2 = Smartphone(
+        "Samsung Galaxy S24", "Новый флагман", 99990.0, 10,
+        "максимальная", "S24", 256, "фиолетовый"
+    )
+
+    # Создание газонной травы
+    grass1 = LawnGrass(
+        "Газон 'Изумруд'", "Спортивный газон", 1500.0, 50,
+        "Россия", 14, "зеленый"
+    )
+    grass2 = LawnGrass(
+        "Газон 'Мавританский'", "Цветущий газон", 2000.0, 30,
+        "Германия", 21, "разноцветный"
+    )
+
+    print("\n--- Смартфоны ---")
+    print(str(smartphone1))
+    print(str(smartphone2))
+
+    print("\n--- Газонная трава ---")
+    print(str(grass1))
+    print(str(grass2))
+
+    # Демонстрация сложения (Задание 2)
+    print("\n••• Сложение товаров одного класса •••")
+    print(f"Смартфон + Смартфон = {smartphone1 + smartphone2}")
+    print(f"Трава + Трава = {grass1 + grass2}")
+
+    print("\n••• Попытка сложения товаров разных классов •••")
+    try:
+        result = smartphone1 + grass1
+        print(f"Результат: {result}")
+    except TypeError as e:
+        print(f"Ошибка (ожидаемо): {e}")
+
+    # Демонстрация добавления в категории (Задание 3)
+    print("\n••• Добавление товаров в категории •••")
+    electronics_category = Category("Электроника", "Различные электронные устройства", [])
+
+    electronics_category.add_product(smartphone1)
+    electronics_category.add_product(smartphone2)
+    electronics_category.add_product(product1)  # Обычный продукт тоже можно добавить
+
+    print("Товары в категории 'Электроника':")
+    print(electronics_category.products)
+
+    garden_category = Category("Сад и огород", "Товары для сада", [])
+    garden_category.add_product(grass1)
+    garden_category.add_product(grass2)
+
+    print("\nТовары в категории 'Сад и огород':")
+    print(garden_category.products)
+
+    print("\n••• Попытка добавить объект неправильного типа •••")
+    try:
+        electronics_category.add_product("это строка, а не продукт")
+    except TypeError as e:
+        print(f"Ошибка (ожидаемо): {e}")
+
+    # Загрузка из JSON
     categories = load_categories_from_json('data/products.json')
     print("\nКатегории и продукты из внешнего файла:")
     for cat in categories:
         print(f"Категория: {cat.name}, товаров: {len(cat.get_products_list())}")
 
-    # Демонстрация итератора (дополнительное задание)
+    # Демонстрация итератора
     print("\n••• Итерация по товарам категории (дополнительное задание) •••")
     for product in category1:
         print(f"  {product}")
