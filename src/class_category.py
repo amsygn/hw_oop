@@ -33,7 +33,14 @@ class Category:
         return "\n".join(result)
 
     def add_product(self, product: Product) -> None:
-        """Метод для добавления продукта в категорию."""
+        """
+        Метод для добавления продукта в категорию.
+        Задание 3: защита от добавления объектов, не являющихся Product или его наследниками.
+        """
+        # Проверяем, является ли product экземпляром Product или его наследником
+        if not isinstance(product, Product):
+            raise TypeError(f"Можно добавлять только объекты класса Product или его наследников. "
+                           f"Получен {type(product).__name__}")
         self.__products.append(product)
         Category.product_count += 1
 
@@ -48,24 +55,17 @@ class Category:
         """
         Строковое представление категории.
         Формат: "Название категории, количество продуктов: X шт."
-        Где количество продуктов - суммарное количество всех товаров на складе в категории.
         """
         total_quantity = sum(product.quantity for product in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity} шт."
 
     def __iter__(self):
-        """
-        Возвращает итератор для перебора товаров категории.
-        (Дополнительное задание)
-        """
+        """Возвращает итератор для перебора товаров категории."""
         return CategoryIterator(self)
 
 
 class CategoryIterator:
-    """
-    Вспомогательный класс для итерации по товарам категории.
-    (Дополнительное задание)
-    """
+    """Вспомогательный класс для итерации по товарам категории."""
 
     def __init__(self, category: Category):
         self._category = category
