@@ -59,17 +59,18 @@ if __name__ == '__main__':
     print(f'Товары в наличии:', category2.products)
     print()
 
+    # Сводная информация по категориям
     products_list = category2.get_products_list()
     if products_list:
         print(f'Товары в наличии:', products_list[0].name)
 
+    print("••• Сводная информация по категориям •••")
     print(f'Всего категорий: ', Category.category_count)
     print(f'Всего товаров в наличии:', Category.product_count)
 
     # Демонстрация новых классов-наследников (Задание 1)
-    print("\n" + "="*50)
-    print("••• Демонстрация новых классов-наследников •••")
-    print("="*50)
+    print("ДОМАШНЕЕ ЗАДАНИЕ 16.1")
+    print("••• Демонстрация новых классов-наследников •••")    
 
     # Создание смартфонов
     smartphone1 = Smartphone(
@@ -91,11 +92,11 @@ if __name__ == '__main__':
         "Германия", 21, "разноцветный"
     )
 
-    print("\n--- Смартфоны ---")
+    print("\nКатегория: Смартфоны")
     print(str(smartphone1))
     print(str(smartphone2))
 
-    print("\n--- Газонная трава ---")
+    print("\nКатегория: Газонная трава")
     print(str(grass1))
     print(str(grass2))
 
@@ -137,7 +138,7 @@ if __name__ == '__main__':
 
     # Загрузка из JSON
     categories = load_categories_from_json('data/products.json')
-    print("\nКатегории и продукты из внешнего файла:")
+    print("\n••• Категории и продукты из внешнего файла JSON•••")
     for cat in categories:
         print(f"Категория: {cat.name}, товаров: {len(cat.get_products_list())}")
 
