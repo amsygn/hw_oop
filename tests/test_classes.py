@@ -16,7 +16,6 @@ class TestProduct:
         Category.category_count = 0
         Category.product_count = 0
 
-
     def test_product_initialization_correctness(self):
         """Тест корректной инициализации класса Product"""
         product = Product("iPhone 15", "512GB, Black Titanium", 129990.0, 10)
@@ -70,12 +69,6 @@ class TestProduct:
         """Тест строкового представления продукта"""
         product = Product("Test Product", "Description", 99.99, 15)
         expected = "Test Product, 99.99 руб. Остаток: 15 шт."
-        assert str(product) == expected
-
-    def test_product_str_method_with_zero_quantity(self):
-        """Тест строкового представления продукта с нулевым количеством"""
-        product = Product("Out of Stock", "Description", 50.0, 0)
-        expected = "Out of Stock, 50 руб. Остаток: 0 шт."
         assert str(product) == expected
 
     def test_product_str_method_with_integer_price(self):

@@ -51,7 +51,8 @@ class Product:
             raise TypeError(f"Невозможно сложить Product с {type(other).__name__}")
         # Задание 2: проверка, что объекты одного класса
         if type(self) != type(other):
-            raise TypeError(f"Невозможно сложить товары разных классов: {type(self).__name__} и {type(other).__name__}")
+            raise TypeError(f"Невозможно сложить товары разных классов: "
+                            f"{type(self).__name__} и {type(other).__name__}")
         return (self.price * self.quantity) + (other.price * other.quantity)
 
     @classmethod
