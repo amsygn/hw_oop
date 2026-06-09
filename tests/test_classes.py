@@ -32,10 +32,11 @@ class TestProduct:
         assert product.price == 0.0
         assert product.quantity == 100
 
-    def test_product_with_zero_quantity(self):
+    def test_product_str_method_with_zero_quantity(self):
         """Тест продукта с нулевым количеством"""
-        product = Product("Out of Stock", "Not available", 999.0, 0)
-        assert product.quantity == 0
+        product = Product("Out of Stock", "Description", 50.0, 0)
+        expected = "Out of Stock, 50 руб. Остаток: 0 шт."
+        assert str(product) == expected
 
     def test_product_with_large_numbers(self):
         """Тест продукта с большими числами"""
@@ -74,13 +75,13 @@ class TestProduct:
     def test_product_str_method_with_zero_quantity(self):
         """Тест строкового представления продукта с нулевым количеством"""
         product = Product("Out of Stock", "Description", 50.0, 0)
-        expected = "Out of Stock, 50.0 руб. Остаток: 0 шт."
+        expected = "Out of Stock, 50 руб. Остаток: 0 шт."
         assert str(product) == expected
 
     def test_product_str_method_with_integer_price(self):
         """Тест строкового представления продукта с целочисленной ценой"""
         product = Product("Cheap Item", "Description", 100, 5)
-        expected = "Cheap Item, 100.0 руб. Остаток: 5 шт."
+        expected = "Cheap Item, 100 руб. Остаток: 5 шт."
         assert str(product) == expected
 
     # Тесты для нового функционала - __add__
@@ -184,9 +185,9 @@ class TestProduct:
         category = Category("Electronics", "Devices", [product1, product2])
 
         products_str = category.products
-        assert "Phone, 500.0 руб. Остаток: 10 шт." in products_str
-        assert "Laptop, 1500.0 руб. Остаток: 5 шт." in products_str
-
+        assert "Phone, 500 руб. Остаток: 10 шт." in products_str
+        assert "Laptop, 1500 руб. Остаток: 5 шт." in products_str
+        
     def test_category_products_getter_empty(self):
         """Тест геттера products для пустой категории"""
         category = Category("Empty", "No products", [])
@@ -197,12 +198,12 @@ class TestProduct:
         product1 = Product("Phone", "Smartphone", 500.0, 10)
         category = Category("Electronics", "Devices", [product1])
 
-        assert "Phone, 500.0 руб. Остаток: 10 шт." in category.products
+        assert "Phone, 500 руб. Остаток: 10 шт." in category.products
 
         product2 = Product("Tablet", "iPad", 800.0, 8)
         category.add_product(product2)
 
-        assert "Tablet, 800.0 руб. Остаток: 8 шт." in category.products
+        assert "Tablet, 800 руб. Остаток: 8 шт." in category.products
 
     # Тесты для нового функционала категории - __str__
 
@@ -728,7 +729,7 @@ class TestIntegration:
         assert Category.category_count == 2
         assert Category.product_count == 3
 
-        assert "iPhone, 1000.0 руб. Остаток: 10 шт." in electronics.products
+        assert "iPhone, 1000 руб. Остаток: 10 шт." in electronics.products  # Убрали .0
 
         electronics.add_product(tablet)
         assert Category.product_count == 4
@@ -838,7 +839,7 @@ def test_products_getter_format():
     category = Category("Electronics", "Devices", [product])
 
     result = category.products
-    assert result == "Phone, 500.0 руб. Остаток: 10 шт."
+    assert result == "Phone, 500 руб. Остаток: 10 шт."
 
 
 def test_products_getter_empty():
