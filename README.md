@@ -36,11 +36,11 @@
 Name                    Stmts   Miss  Cover
 -------------------------------------------
 src\__init__.py             0      0   100%
-src\class_category.py      41      1    98%
-src\class_product.py       43      0   100%
+src\class_category.py      43      1    98%
+src\class_product.py       65      0   100%
 src\from_jason.py          16      0   100%
 -------------------------------------------
-TOTAL                     100      1    99%
+TOTAL                     124      1    99%
 
 
 ### Пример работы функции `filter_by_state`:
