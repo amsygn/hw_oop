@@ -138,7 +138,7 @@ if __name__ == '__main__':
 
     # Загрузка из JSON
     categories = load_categories_from_json('data/products.json')
-    print("\n••• Категории и продукты из внешнего файла JSON•••")
+    print("\n••• Категории и продукты из внешнего файла JSON •••")
     for cat in categories:
         print(f"Категория: {cat.name}, товаров: {len(cat.get_products_list())}")
 
