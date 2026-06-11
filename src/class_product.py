@@ -1,3 +1,10 @@
+from abc import ABC, abstractmethod
+
+class Product(ABC):
+    def __init__(self):
+        pass
+
+
 class Product:
     """Класс, представляющий продукт."""
 
