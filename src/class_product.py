@@ -27,11 +27,11 @@ class PrintMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Выводит информацию о создании объекта."""
+        # Формируем строку с аргументами для вывода
         if args:
-            # Преобразуем аргументы в строковое представление
             args_str = ', '.join(repr(arg) for arg in args)
             print(f"{self.__class__.__name__}({args_str})")
-        super().__init__(*args, **kwargs)
+        # НЕ вызываем super().__init__() здесь, чтобы избежать проблем с object
 
 
 class Product(BaseProduct, PrintMixin):
@@ -42,8 +42,8 @@ class Product(BaseProduct, PrintMixin):
         self.description = description
         self.__price = float(price)
         self.quantity = quantity
-        # Вызываем миксин через super() для правильного MRO
-        super().__init__(name, description, price, quantity)
+        # Вызываем миксин явно
+        PrintMixin.__init__(self, name, description, price, quantity)
 
     @property
     def price(self) -> float:
@@ -70,7 +70,6 @@ class Product(BaseProduct, PrintMixin):
 
     def __str__(self) -> str:
         """Строковое представление продукта."""
-        # Всегда выводим цену с .0 для единообразия с тестами
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other: 'Product') -> float:
