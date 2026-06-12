@@ -1,7 +1,7 @@
 | Name                    |    Stmts |     Miss |   Cover |
 |------------------------ | -------: | -------: | ------: |
-| src\\\_\_init\_\_.py    |        0 |        0 |    100% |
-| src\\class\_category.py |       43 |        1 |     98% |
-| src\\class\_product.py  |       65 |        0 |    100% |
+| src\\\_\_init\_\_.py    |        4 |        0 |    100% |
+| src\\class\_category.py |       65 |        3 |     95% |
+| src\\class\_product.py  |       88 |        5 |     94% |
 | src\\from\_jason.py     |       16 |        0 |    100% |
-| **TOTAL**               |  **124** |    **1** | **99%** |
+| **TOTAL**               |  **173** |    **8** | **95%** |

@@ -3,8 +3,8 @@ import pytest
 import json
 import tempfile
 
-from src.class_product import Product, Smartphone, LawnGrass
-from src.class_category import Category
+from src.class_product import BaseProduct, Product, Smartphone, LawnGrass
+from src.class_category import BaseCategory, Category, Order
 from src.from_jason import load_categories_from_json
 
 
@@ -77,7 +77,7 @@ class TestProduct:
         expected = "Cheap Item, 100 руб. Остаток: 5 шт."
         assert str(product) == expected
 
-    # Тесты для нового функционала - __add__
+    # Тесты для магического метода __add__
 
     def test_product_add_method(self):
         """Тест сложения двух продуктов"""
@@ -132,7 +132,7 @@ class TestProduct:
         with pytest.raises(TypeError, match="Невозможно сложить Product с int"):
             add_with_int()
 
-    # Остальные существующие тесты...
+    # Остальные тесты
 
     def test_add_product_to_category(self):
         """Тест добавления продукта в категорию через add_product"""
@@ -198,7 +198,7 @@ class TestProduct:
 
         assert "Tablet, 800 руб. Остаток: 8 шт." in category.products
 
-    # Тесты для нового функционала категории - __str__
+    # Тесты для магического метода __str__
 
     def test_category_str_method(self):
         """Тест строкового представления категории"""
@@ -273,7 +273,7 @@ class TestProduct:
         with pytest.raises(StopIteration):
             next(iterator)
 
-    # Остальные существующие тесты для Product...
+    # Остальные тесты для Product
 
     def test_new_product_without_existing_products(self):
         """Тест new_product без проверки существующих продуктов"""
@@ -1078,7 +1078,6 @@ class TestCategoryAddProductRestriction:
         category.add_product(product1)
         category.add_product(product2)
 
-        # Оба продукта добавлены, так как это разные объекты
         assert len(category.get_products_list()) == 2
 
 
@@ -1118,3 +1117,183 @@ class TestInheritanceIntegration:
 
         expected = "Mixed, количество продуктов: 18 шт."  # 5 + 3 + 10 = 18
         assert str(category) == expected
+
+# 16.2
+# Тесты для абстрактного класса BaseProduct
+
+class TestBaseProduct:
+    """Тесты для абстрактного класса BaseProduct"""
+
+    def test_base_product_is_abstract(self):
+        """Тест: BaseProduct является абстрактным классом"""
+        from abc import ABC
+        assert issubclass(BaseProduct, ABC)
+
+    def test_product_implements_base_product(self):
+        """Тест: Product реализует BaseProduct"""
+        assert issubclass(Product, BaseProduct)
+
+    def test_smartphone_implements_base_product(self):
+        """Тест: Smartphone реализует BaseProduct через Product"""
+        assert issubclass(Smartphone, BaseProduct)
+
+    def test_lawn_grass_implements_base_product(self):
+        """Тест: LawnGrass реализует BaseProduct через Product"""
+        assert issubclass(LawnGrass, BaseProduct)
+
+
+# Тесты для миксина PrintMixin
+
+class TestPrintMixin:
+    """Тесты для миксина PrintMixin"""
+
+    def test_print_mixin_output_on_product_creation(self, capsys):
+        """Тест: при создании Product выводится информация"""
+        product = Product("Test Product", "Description", 100.0, 5)
+        captured = capsys.readouterr()
+        assert "Product('Test Product', 'Description', 100.0, 5)" in captured.out
+
+    def test_print_mixin_output_on_smartphone_creation(self, capsys):
+        """Тест: при создании Smartphone выводится информация"""
+        smartphone = Smartphone("Test Phone", "Desc", 100.0, 5, "high", "M1", 128, "red")
+        captured = capsys.readouterr()
+        assert "Smartphone('Test Phone', 'Desc', 100.0, 5, 'high', 'M1', 128, 'red')" in captured.out
+
+    def test_print_mixin_output_on_lawn_grass_creation(self, capsys):
+        """Тест: при создании LawnGrass выводится информация"""
+        grass = LawnGrass("Test Grass", "Desc", 100.0, 5, "Russia", 14, "green")
+        captured = capsys.readouterr()
+        assert "LawnGrass('Test Grass', 'Desc', 100.0, 5, 'Russia', 14, 'green')" in captured.out
+
+    def test_print_mixin_multiple_creations(self, capsys):
+        """Тест: несколько созданий - несколько выводов"""
+        product1 = Product("P1", "D1", 100.0, 5)
+        product2 = Product("P2", "D2", 200.0, 3)
+        captured = capsys.readouterr()
+        assert "Product('P1', 'D1', 100.0, 5)" in captured.out
+        assert "Product('P2', 'D2', 200.0, 3)" in captured.out
+
+
+# Тесты для абстрактного класса BaseCategory
+
+class TestBaseCategory:
+    """Тесты для абстрактного класса BaseCategory"""
+
+    def test_base_category_is_abstract(self):
+        """Тест: BaseCategory является абстрактным классом"""
+        from abc import ABC
+        assert issubclass(BaseCategory, ABC)
+
+    def test_category_implements_base_category(self):
+        """Тест: Category реализует BaseCategory"""
+        assert issubclass(Category, BaseCategory)
+
+    def test_order_implements_base_category(self):
+        """Тест: Order реализует BaseCategory"""
+        assert issubclass(Order, BaseCategory)
+
+
+# Тесты для класса Order (дополнительное задание)
+
+class TestOrder:
+    """Тесты для класса Order"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_order_initialization(self):
+        """Тест корректной инициализации заказа"""
+        product = Product("Test Product", "Desc", 100.0, 10)
+        order = Order(product, 3)
+
+        assert order.product is product
+        assert order.quantity == 3
+        assert order.total_price == 300.0
+
+    def test_order_get_products_list(self):
+        """Тест получения списка продуктов в заказе"""
+        product = Product("Test Product", "Desc", 100.0, 10)
+        order = Order(product, 3)
+
+        products_list = order.get_products_list()
+        assert len(products_list) == 1
+        assert products_list[0] is product
+
+    def test_order_str_method(self):
+        """Тест строкового представления заказа"""
+        product = Product("Test Product", "Desc", 100.0, 10)
+        order = Order(product, 3)
+        expected = "Заказ: Test Product, 3 шт., итого: 300 руб."
+        assert str(order) == expected
+
+    def test_order_str_method_with_float_price(self):
+        """Тест строкового представления заказа с дробной ценой"""
+        product = Product("Test Product", "Desc", 99.99, 10)
+        order = Order(product, 2)
+        expected = "Заказ: Test Product, 2 шт., итого: 199.98 руб."
+        assert str(order) == expected
+
+    def test_order_quantity_zero_raises_error(self):
+        """Тест: создание заказа с нулевым количеством вызывает ошибку"""
+        product = Product("Test", "Desc", 100.0, 10)
+        with pytest.raises(ValueError, match="Количество товара должно быть положительным"):
+            Order(product, 0)
+
+    def test_order_quantity_negative_raises_error(self):
+        """Тест: создание заказа с отрицательным количеством вызывает ошибку"""
+        product = Product("Test", "Desc", 100.0, 10)
+        with pytest.raises(ValueError, match="Количество товара должно быть положительным"):
+            Order(product, -5)
+
+    def test_order_quantity_exceeds_stock_raises_error(self):
+        """Тест: создание заказа с количеством больше доступного вызывает ошибку"""
+        product = Product("Test", "Desc", 100.0, 10)
+        with pytest.raises(ValueError, match="Недостаточно товара на складе"):
+            Order(product, 15)
+
+    def test_order_with_smartphone(self):
+        """Тест: создание заказа со смартфоном"""
+        smartphone = Smartphone("Phone", "Desc", 500.0, 5, "high", "M1", 128, "black")
+        order = Order(smartphone, 2)
+        assert order.product is smartphone
+        assert order.total_price == 1000.0
+
+    def test_order_with_lawn_grass(self):
+        """Тест: создание заказа с газонной травой"""
+        grass = LawnGrass("Grass", "Desc", 100.0, 20, "Russia", 14, "green")
+        order = Order(grass, 5)
+        assert order.product is grass
+        assert order.total_price == 500.0
+
+
+class TestBaseProductIntegration:
+    """Интеграционные тесты для абстрактного класса"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_all_products_share_base_class(self):
+        """Тест: все продукты имеют общий базовый класс"""
+        product = Product("P", "D", 100.0, 5)
+        smartphone = Smartphone("S", "D", 200.0, 3, "high", "M1", 128, "red")
+        grass = LawnGrass("G", "D", 50.0, 10, "Russia", 14, "green")
+
+        assert isinstance(product, BaseProduct)
+        assert isinstance(smartphone, BaseProduct)
+        assert isinstance(grass, BaseProduct)
+
+    def test_order_accepts_any_product_type(self):
+        """Тест: заказ может содержать любой тип продукта"""
+        product = Product("P", "D", 100.0, 10)
+        smartphone = Smartphone("S", "D", 200.0, 5, "high", "M1", 128, "red")
+        grass = LawnGrass("G", "D", 50.0, 20, "Russia", 14, "green")
+
+        order1 = Order(product, 2)
+        order2 = Order(smartphone, 1)
+        order3 = Order(grass, 3)
+
+        assert order1.total_price == 200.0
+        assert order2.total_price == 200.0
+        assert order3.total_price == 150.0
