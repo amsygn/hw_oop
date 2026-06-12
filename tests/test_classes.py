@@ -63,7 +63,7 @@ class TestProduct:
         assert product.price == 450.0
         assert product.quantity == 8
 
-    # Тесты для нового функционала - __str__
+    # Тесты для метода __str__
 
     def test_product_str_method(self):
         """Тест строкового представления продукта"""
@@ -77,7 +77,7 @@ class TestProduct:
         expected = "Cheap Item, 100.0 руб. Остаток: 5 шт."
         assert str(product) == expected
 
-    # Тесты для магического метода __add__
+    # Тесты для метода __add__
 
     def test_product_add_method(self):
         """Тест сложения двух продуктов"""
@@ -85,7 +85,7 @@ class TestProduct:
         product_b = Product("Product B", "Desc", 200.0, 2)
 
         result = product_a + product_b
-        expected = 100 * 10 + 200 * 2  # 1000 + 400 = 1400
+        expected = 100 * 10 + 200 * 2
         assert result == expected
 
     def test_product_add_method_with_large_numbers(self):
@@ -94,7 +94,7 @@ class TestProduct:
         product_b = Product("Expensive B", "Desc", 2000.0, 50)
 
         result = product_a + product_b
-        expected = 1000 * 100 + 2000 * 50  # 100000 + 100000 = 200000
+        expected = 1000 * 100 + 2000 * 50
         assert result == expected
 
     def test_product_add_method_with_zero_quantity(self):
@@ -103,7 +103,7 @@ class TestProduct:
         product_b = Product("Product B", "Desc", 200.0, 0)
 
         result = product_a + product_b
-        expected = 100 * 10 + 200 * 0  # 1000 + 0 = 1000
+        expected = 100 * 10 + 200 * 0
         assert result == expected
 
     def test_product_add_method_with_zero_price(self):
@@ -112,7 +112,7 @@ class TestProduct:
         product_b = Product("Free Product", "Desc", 0.0, 5)
 
         result = product_a + product_b
-        expected = 100 * 10 + 0 * 5  # 1000 + 0 = 1000
+        expected = 100 * 10 + 0 * 5
         assert result == expected
 
     def test_product_add_method_with_same_product(self):
@@ -306,8 +306,8 @@ class TestProduct:
         result = Product.new_product(product_data, existing_products)
 
         assert result is existing_product
-        assert result.quantity == 8  # 5 + 3
-        assert result.price == 1000.0  # Цена осталась прежней
+        assert result.quantity == 8
+        assert result.price == 1000.0
 
     def test_new_product_with_duplicate_higher_price(self):
         """Тест new_product с дубликатом и более высокой ценой"""
@@ -324,7 +324,7 @@ class TestProduct:
         result = Product.new_product(product_data, existing_products)
 
         assert result is existing_product
-        assert result.quantity == 8  # 5 + 3
+        assert result.quantity == 8
         assert result.price == 1200.0  # Выбрана максимальная цена
 
     def test_new_product_with_duplicate_lower_price(self):
@@ -342,7 +342,7 @@ class TestProduct:
         result = Product.new_product(product_data, existing_products)
 
         assert result is existing_product
-        assert result.quantity == 8  # 5 + 3
+        assert result.quantity == 8
         assert result.price == 1000.0  # Оставлена более высокая цена
 
     def test_new_product_with_multiple_existing_products(self):
@@ -363,7 +363,7 @@ class TestProduct:
         result = Product.new_product(product_data, existing_products)
 
         assert result.name == "Samsung"
-        assert result.quantity == 17  # 10 + 7
+        assert result.quantity == 17
         assert result.price == 950.0
 
     def test_product_price_getter(self):
@@ -722,7 +722,7 @@ class TestIntegration:
         assert Category.category_count == 2
         assert Category.product_count == 3
 
-        assert "iPhone, 1000.0 руб. Остаток: 10 шт." in electronics.products  # Убрали .0
+        assert "iPhone, 1000.0 руб. Остаток: 10 шт." in electronics.products
 
         electronics.add_product(tablet)
         assert Category.product_count == 4
@@ -936,7 +936,7 @@ class TestSmartphone:
         s1 = Smartphone("S1", "D1", 100.0, 10, "high", "M1", 128, "red")
         s2 = Smartphone("S2", "D2", 200.0, 5, "high", "M2", 256, "blue")
         result = s1 + s2
-        expected = 100 * 10 + 200 * 5  # 1000 + 1000 = 2000
+        expected = 100 * 10 + 200 * 5
         assert result == expected
 
 
@@ -979,7 +979,7 @@ class TestLawnGrass:
         g1 = LawnGrass("G1", "D1", 100.0, 10, "Russia", 14, "green")
         g2 = LawnGrass("G2", "D2", 150.0, 4, "Germany", 21, "dark green")
         result = g1 + g2
-        expected = 100 * 10 + 150 * 4  # 1000 + 600 = 1600
+        expected = 100 * 10 + 150 * 4
         assert result == expected
 
 
@@ -1115,7 +1115,7 @@ class TestInheritanceIntegration:
         category.add_product(smartphone)
         category.add_product(grass)
 
-        expected = "Mixed, количество продуктов: 18 шт."  # 5 + 3 + 10 = 18
+        expected = "Mixed, количество продуктов: 18 шт."
         assert str(category) == expected
 
 # 16.2
@@ -1159,7 +1159,6 @@ class TestPrintMixin:
         captured = capsys.readouterr()
         # Миксин выводит только аргументы, переданные в __init__ базового класса
         assert "Smartphone('Test Phone', 'Desc', 100.0, 5)" in captured.out
-        # Дополнительные аргументы не выводятся, так как они не передаются в super().__init__
 
     def test_print_mixin_output_on_lawn_grass_creation(self, capsys):
         """Тест: при создании LawnGrass выводится информация о базовых аргументах"""
