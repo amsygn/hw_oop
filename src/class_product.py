@@ -28,7 +28,6 @@ class PrintMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Выводит информацию о создании объекта."""
         print(f"{self.__class__.__name__}{args}")
-        super().__init__(*args, **kwargs)
 
 
 class Product(BaseProduct, PrintMixin):
@@ -39,7 +38,7 @@ class Product(BaseProduct, PrintMixin):
         self.description = description
         self.__price = float(price)
         self.quantity = quantity
-        super().__init__(name, description, price, quantity)  # Вызов миксина
+        PrintMixin.__init__(self, name, description, price, quantity)
 
     @property
     def price(self) -> float:
