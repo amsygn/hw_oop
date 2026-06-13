@@ -19,7 +19,6 @@ class Product:
             print("Цена не должна быть нулевая или отрицательная")
             return
 
-        # Дополнительное задание: подтверждение при понижении цены
         if value < self.__price:
             user_input = input(f"Цена понижается с {self.__price} до {value}. Вы согласны? (y/n): ")
             if user_input.lower() == 'y':
@@ -30,6 +29,22 @@ class Product:
         else:
             self.__price = value
             print(f"Цена изменена на {value}")
+
+    def __str__(self) -> str:
+        """
+        Строковое представление продукта.
+        Формат: "Название продукта, X руб. Остаток: X шт."
+        """
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: 'Product') -> float:
+        """
+        Магический метод сложения двух продуктов.
+        Возвращает сумму произведений цены на количество.
+        """
+        if not isinstance(other, Product):
+            raise TypeError(f"Невозможно сложить Product с {type(other).__name__}")
+        return (self.price * self.quantity) + (other.price * other.quantity)
 
     @classmethod
     def new_product(cls, product_data: dict, existing_products: list = None) -> 'Product':

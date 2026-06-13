@@ -25,9 +25,10 @@ class Category:
         if not self.__products:
             return "В категории нет товаров"
 
+        # Оптимизирован с использованием __str__ продукта
         result = []
         for product in self.__products:
-            result.append(f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.")
+            result.append(str(product))
 
         return "\n".join(result)
 
@@ -42,3 +43,40 @@ class Category:
         Возвращает список объектов Product.
         """
         return self.__products
+
+    def __str__(self) -> str:
+        """
+        Строковое представление категории.
+        Формат: "Название категории, количество продуктов: X шт."
+        Где количество продуктов - суммарное количество всех товаров на складе в категории.
+        """
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
+
+    def __iter__(self):
+        """
+        Возвращает итератор для перебора товаров категории.
+        (Дополнительное задание)
+        """
+        return CategoryIterator(self)
+
+
+class CategoryIterator:
+    """
+    Вспомогательный класс для итерации по товарам категории.
+    (Дополнительное задание)
+    """
+
+    def __init__(self, category: Category):
+        self._category = category
+        self._index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> Product:
+        if self._index < len(self._category.get_products_list()):
+            product = self._category.get_products_list()[self._index]
+            self._index += 1
+            return product
+        raise StopIteration
