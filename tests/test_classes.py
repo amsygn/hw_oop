@@ -180,7 +180,7 @@ class TestProduct:
         products_str = category.products
         assert "Phone, 500.0 руб. Остаток: 10 шт." in products_str
         assert "Laptop, 1500.0 руб. Остаток: 5 шт." in products_str
-        
+
     def test_category_products_getter_empty(self):
         """Тест геттера products для пустой категории"""
         category = Category("Empty", "No products", [])
@@ -444,6 +444,9 @@ class TestCategory:
         product = Product("Single", "Only one", 100.0, 1)
         category = Category("Single Category", "Just one product", [product])
 
+        assert category.name == "Single Category"
+        assert category.description == "Just one product"
+        assert len(category.get_products_list()) == 1
         assert Category.product_count == 1
 
     def test_category_counters_with_multiple_categories(self):
@@ -618,7 +621,6 @@ class TestLoadCategoriesFromJSON:
         finally:
             os.unlink(temp_file)
 
-
     def test_load_categories_from_multiple_categories_json(self):
         """Тест загрузки нескольких категорий из JSON"""
         json_data = [
@@ -723,6 +725,8 @@ class TestIntegration:
         assert Category.product_count == 3
 
         assert "iPhone, 1000.0 руб. Остаток: 10 шт." in electronics.products
+        assert "iPad, 500.0 руб. Остаток: 8 шт." in accessories.products  # Добавлена проверка
+        assert len(accessories.get_products_list()) == 1  # Дополнительная проверка
 
         electronics.add_product(tablet)
         assert Category.product_count == 4
@@ -1121,6 +1125,7 @@ class TestInheritanceIntegration:
 # 16.2
 # Тесты для абстрактного класса BaseProduct
 
+
 class TestBaseProduct:
     """Тесты для абстрактного класса BaseProduct"""
 
@@ -1152,6 +1157,11 @@ class TestPrintMixin:
         product = Product("Test Product", "Description", 100.0, 5)
         captured = capsys.readouterr()
         assert "Product('Test Product', 'Description', 100.0, 5)" in captured.out
+        # Добавляем проверку, что объект создан корректно
+        assert product.name == "Test Product"
+        assert product.description == "Description"
+        assert product.price == 100.0
+        assert product.quantity == 5
 
     def test_print_mixin_output_on_smartphone_creation(self, capsys):
         """Тест: при создании Smartphone выводится информация о базовых аргументах"""
@@ -1159,6 +1169,15 @@ class TestPrintMixin:
         captured = capsys.readouterr()
         # Миксин выводит только аргументы, переданные в __init__ базового класса
         assert "Smartphone('Test Phone', 'Desc', 100.0, 5)" in captured.out
+        # Добавляем проверки, что объект создан корректно
+        assert smartphone.name == "Test Phone"
+        assert smartphone.description == "Desc"
+        assert smartphone.price == 100.0
+        assert smartphone.quantity == 5
+        assert smartphone.efficiency == "high"
+        assert smartphone.model == "M1"
+        assert smartphone.memory == 128
+        assert smartphone.color == "red"
 
     def test_print_mixin_output_on_lawn_grass_creation(self, capsys):
         """Тест: при создании LawnGrass выводится информация о базовых аргументах"""
@@ -1166,6 +1185,14 @@ class TestPrintMixin:
         captured = capsys.readouterr()
         # Миксин выводит только аргументы, переданные в __init__ базового класса
         assert "LawnGrass('Test Grass', 'Desc', 100.0, 5)" in captured.out
+        # Добавляем проверки, что объект создан корректно
+        assert grass.name == "Test Grass"
+        assert grass.description == "Desc"
+        assert grass.price == 100.0
+        assert grass.quantity == 5
+        assert grass.country == "Russia"
+        assert grass.germination_period == 14
+        assert grass.color == "green"
 
     def test_print_mixin_multiple_creations(self, capsys):
         """Тест: несколько созданий - несколько выводов"""
@@ -1174,9 +1201,14 @@ class TestPrintMixin:
         captured = capsys.readouterr()
         assert "Product('P1', 'D1', 100.0, 5)" in captured.out
         assert "Product('P2', 'D2', 200.0, 3)" in captured.out
-
+        # Добавляем проверки
+        assert product1.name == "P1"
+        assert product2.name == "P2"
+        assert product1.price == 100.0
+        assert product2.price == 200.0
 
 # Тесты для абстрактного класса BaseCategory
+
 
 class TestBaseCategory:
     """Тесты для абстрактного класса BaseCategory"""

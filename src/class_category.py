@@ -46,8 +46,10 @@ class Category(BaseCategory):
     def add_product(self, product: Product) -> None:
         """Метод для добавления продукта в категорию."""
         if not isinstance(product, Product):
-            raise TypeError(f"Можно добавлять только объекты класса Product или его наследников. "
-                           f"Получен {type(product).__name__}")
+            raise TypeError(
+                f"Можно добавлять только объекты класса Product или его наследников."
+                f"Получен {type(product).__name__}"
+            )
         self.__products.append(product)
         Category.product_count += 1
 
@@ -101,5 +103,6 @@ class Order(BaseCategory):
 
     def __str__(self) -> str:
         """Строковое представление заказа."""
-        price_str = str(int(self.total_price)) if self.total_price == int(self.total_price) else str(self.total_price)
+        price_str = str(int(self.total_price)) if self.total_price == int(self.total_price) \
+            else str(self.total_price)
         return f"Заказ: {self.product.name}, {self.quantity} шт., итого: {price_str} руб."

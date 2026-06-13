@@ -40,11 +40,11 @@ if __name__ == '__main__':
     print()
 
     print("••• Общая информация о категории •••")
-    print(f'Категория:', category1.name)
-    print(f'Описание:', category1.description)
-    print(f'Товары в наличии:', category1.products)
-    print(f'Кол-во категорий:', category1.category_count)
-    print(f'Кол-во товаров:', category1.product_count)
+    print('Категория:', category1.name)
+    print('Описание:', category1.description)
+    print('Товары в наличии:', category1.products)
+    print('Кол-во категорий:', category1.category_count)
+    print('Кол-во товаров:', category1.product_count)
     print()
 
     product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
@@ -54,18 +54,18 @@ if __name__ == '__main__':
                          [product4])
 
     print("••• Новая категория •••")
-    print(f'Категория:', category2.name)
-    print(f'Описание:', category2.description)
-    print(f'Товары в наличии:', category2.products)
+    print('Категория:', category2.name)
+    print('Описание:', category2.description)
+    print('Товары в наличии:', category2.products)
     print()
 
     products_list = category2.get_products_list()
     if products_list:
-        print(f'Товары в наличии:', products_list[0].name)
+        print('Товары в наличии:', products_list[0].name)
 
     print("••• Сводная информация по категориям •••")
-    print(f'Всего категорий: ', Category.category_count)
-    print(f'Всего товаров в наличии:', Category.product_count)
+    print('Всего категорий: ', Category.category_count)
+    print('Всего товаров в наличии:', Category.product_count)
 
     # Демонстрация новых классов-наследников
     print("\n" + "="*50)
