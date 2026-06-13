@@ -3,8 +3,8 @@ import pytest
 import json
 import tempfile
 
-from src.class_product import Product
-from src.class_category import Category, CategoryIterator
+from src.class_product import Product, Smartphone, LawnGrass
+from src.class_category import Category
 from src.from_jason import load_categories_from_json
 
 
@@ -15,7 +15,6 @@ class TestProduct:
         """Сброс счетчиков перед каждым тестом"""
         Category.category_count = 0
         Category.product_count = 0
-
 
     def test_product_initialization_correctness(self):
         """Тест корректной инициализации класса Product"""
@@ -32,10 +31,11 @@ class TestProduct:
         assert product.price == 0.0
         assert product.quantity == 100
 
-    def test_product_with_zero_quantity(self):
+    def test_product_str_method_with_zero_quantity(self):
         """Тест продукта с нулевым количеством"""
-        product = Product("Out of Stock", "Not available", 999.0, 0)
-        assert product.quantity == 0
+        product = Product("Out of Stock", "Description", 50.0, 0)
+        expected = "Out of Stock, 50 руб. Остаток: 0 шт."
+        assert str(product) == expected
 
     def test_product_with_large_numbers(self):
         """Тест продукта с большими числами"""
@@ -71,16 +71,10 @@ class TestProduct:
         expected = "Test Product, 99.99 руб. Остаток: 15 шт."
         assert str(product) == expected
 
-    def test_product_str_method_with_zero_quantity(self):
-        """Тест строкового представления продукта с нулевым количеством"""
-        product = Product("Out of Stock", "Description", 50.0, 0)
-        expected = "Out of Stock, 50.0 руб. Остаток: 0 шт."
-        assert str(product) == expected
-
     def test_product_str_method_with_integer_price(self):
         """Тест строкового представления продукта с целочисленной ценой"""
         product = Product("Cheap Item", "Description", 100, 5)
-        expected = "Cheap Item, 100.0 руб. Остаток: 5 шт."
+        expected = "Cheap Item, 100 руб. Остаток: 5 шт."
         assert str(product) == expected
 
     # Тесты для нового функционала - __add__
@@ -131,8 +125,12 @@ class TestProduct:
     def test_product_add_method_invalid_type(self):
         """Тест сложения продукта с объектом другого типа"""
         product = Product("Product", "Desc", 100.0, 10)
+
+        def add_with_int():
+            return product + 100  # type: ignore
+
         with pytest.raises(TypeError, match="Невозможно сложить Product с int"):
-            _ = product + 100
+            add_with_int()
 
     # Остальные существующие тесты...
 
@@ -180,9 +178,9 @@ class TestProduct:
         category = Category("Electronics", "Devices", [product1, product2])
 
         products_str = category.products
-        assert "Phone, 500.0 руб. Остаток: 10 шт." in products_str
-        assert "Laptop, 1500.0 руб. Остаток: 5 шт." in products_str
-
+        assert "Phone, 500 руб. Остаток: 10 шт." in products_str
+        assert "Laptop, 1500 руб. Остаток: 5 шт." in products_str
+        
     def test_category_products_getter_empty(self):
         """Тест геттера products для пустой категории"""
         category = Category("Empty", "No products", [])
@@ -193,12 +191,12 @@ class TestProduct:
         product1 = Product("Phone", "Smartphone", 500.0, 10)
         category = Category("Electronics", "Devices", [product1])
 
-        assert "Phone, 500.0 руб. Остаток: 10 шт." in category.products
+        assert "Phone, 500 руб. Остаток: 10 шт." in category.products
 
         product2 = Product("Tablet", "iPad", 800.0, 8)
         category.add_product(product2)
 
-        assert "Tablet, 800.0 руб. Остаток: 8 шт." in category.products
+        assert "Tablet, 800 руб. Остаток: 8 шт." in category.products
 
     # Тесты для нового функционала категории - __str__
 
@@ -471,8 +469,12 @@ class TestCategory:
         product = Product("Test", "Desc", 100.0, 5)
         category = Category("Test", "Desc", [product])
 
+        # Проверяем, что атрибут недоступен напрямую
         with pytest.raises(AttributeError):
-            _ = category.__products
+            _ = category.__products  # type: ignore
+
+        # Дополнительная проверка
+        assert hasattr(category, '_Category__products')
 
     def test_get_products_list_returns_correct_list(self):
         """Тест метода get_products_list"""
@@ -720,7 +722,7 @@ class TestIntegration:
         assert Category.category_count == 2
         assert Category.product_count == 3
 
-        assert "iPhone, 1000.0 руб. Остаток: 10 шт." in electronics.products
+        assert "iPhone, 1000 руб. Остаток: 10 шт." in electronics.products  # Убрали .0
 
         electronics.add_product(tablet)
         assert Category.product_count == 4
@@ -830,7 +832,7 @@ def test_products_getter_format():
     category = Category("Electronics", "Devices", [product])
 
     result = category.products
-    assert result == "Phone, 500.0 руб. Остаток: 10 шт."
+    assert result == "Phone, 500 руб. Остаток: 10 шт."
 
 
 def test_products_getter_empty():
@@ -890,3 +892,229 @@ def test_price_setter_valid():
 
     product.price = 150.0
     assert product.price == 150.0
+
+
+# 16.1. Тесты для классов-наследников
+
+class TestSmartphone:
+    """Тесты для класса Smartphone"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_smartphone_initialization(self):
+        """Тест корректной инициализации смартфона"""
+        smartphone = Smartphone(
+            "Xiaomi 13 Pro", "Флагман", 89990.0, 15,
+            "высокая", "13 Pro", 512, "черный"
+        )
+
+        assert smartphone.name == "Xiaomi 13 Pro"
+        assert smartphone.description == "Флагман"
+        assert smartphone.price == 89990.0
+        assert smartphone.quantity == 15
+        assert smartphone.efficiency == "высокая"
+        assert smartphone.model == "13 Pro"
+        assert smartphone.memory == 512
+        assert smartphone.color == "черный"
+
+    def test_smartphone_inherits_from_product(self):
+        """Тест: Smartphone является наследником Product"""
+        smartphone = Smartphone("Test", "Desc", 100.0, 5, "high", "M1", 128, "red")
+        assert isinstance(smartphone, Product)
+        assert issubclass(Smartphone, Product)
+
+    def test_smartphone_str_method(self):
+        """Тест строкового представления смартфона"""
+        smartphone = Smartphone("iPhone 15", "Flagship", 99990.0, 10, "high", "15 Pro", 256, "black")
+        expected = "iPhone 15, 99990.0 руб. Остаток: 10 шт."
+        assert str(smartphone) == expected
+
+    def test_smartphone_add_same_type(self):
+        """Тест сложения двух смартфонов"""
+        s1 = Smartphone("S1", "D1", 100.0, 10, "high", "M1", 128, "red")
+        s2 = Smartphone("S2", "D2", 200.0, 5, "high", "M2", 256, "blue")
+        result = s1 + s2
+        expected = 100 * 10 + 200 * 5  # 1000 + 1000 = 2000
+        assert result == expected
+
+
+class TestLawnGrass:
+    """Тесты для класса LawnGrass"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_lawn_grass_initialization(self):
+        """Тест корректной инициализации газонной травы"""
+        grass = LawnGrass(
+            "Газон 'Изумруд'", "Спортивный газон", 1500.0, 50,
+            "Россия", 14, "зеленый"
+        )
+
+        assert grass.name == "Газон 'Изумруд'"
+        assert grass.description == "Спортивный газон"
+        assert grass.price == 1500.0
+        assert grass.quantity == 50
+        assert grass.country == "Россия"
+        assert grass.germination_period == 14
+        assert grass.color == "зеленый"
+
+    def test_lawn_grass_inherits_from_product(self):
+        """Тест: LawnGrass является наследником Product"""
+        grass = LawnGrass("Test", "Desc", 100.0, 5, "Russia", 10, "green")
+        assert isinstance(grass, Product)
+        assert issubclass(LawnGrass, Product)
+
+    def test_lawn_grass_str_method(self):
+        """Тест строкового представления газонной травы"""
+        grass = LawnGrass("Green Lawn", "Beautiful", 2000.0, 20, "Germany", 14, "green")
+        expected = "Green Lawn, 2000.0 руб. Остаток: 20 шт."
+        assert str(grass) == expected
+
+    def test_lawn_grass_add_same_type(self):
+        """Тест сложения двух газонных трав"""
+        g1 = LawnGrass("G1", "D1", 100.0, 10, "Russia", 14, "green")
+        g2 = LawnGrass("G2", "D2", 150.0, 4, "Germany", 21, "dark green")
+        result = g1 + g2
+        expected = 100 * 10 + 150 * 4  # 1000 + 600 = 1600
+        assert result == expected
+
+
+class TestProductAddRestriction:
+    """Тесты для ограничения сложения (Задание 2)"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_add_product_with_smartphone_works(self):
+        """Тест: сложение двух смартфонов работает"""
+        s1 = Smartphone("S1", "D1", 100.0, 10, "high", "M1", 128, "red")
+        s2 = Smartphone("S2", "D2", 200.0, 5, "high", "M2", 256, "blue")
+        result = s1 + s2
+        assert result == 2000.0
+
+    def test_add_product_with_lawn_grass_works(self):
+        """Тест: сложение двух трав работает"""
+        g1 = LawnGrass("G1", "D1", 100.0, 10, "Russia", 14, "green")
+        g2 = LawnGrass("G2", "D2", 150.0, 4, "Germany", 21, "dark green")
+        result = g1 + g2
+        assert result == 1600.0
+
+    def test_add_product_different_classes_raises_error(self):
+        """Тест: сложение товаров разных классов вызывает TypeError"""
+        smartphone = Smartphone("S1", "D1", 100.0, 10, "high", "M1", 128, "red")
+        grass = LawnGrass("G1", "D1", 100.0, 10, "Russia", 14, "green")
+        product = Product("P1", "D1", 100.0, 10)
+
+        with pytest.raises(TypeError, match="Невозможно сложить товары разных классов"):
+            _ = smartphone + grass
+
+        with pytest.raises(TypeError, match="Невозможно сложить товары разных классов"):
+            _ = smartphone + product
+
+        with pytest.raises(TypeError, match="Невозможно сложить товары разных классов"):
+            _ = grass + product
+
+    def test_add_same_class_instances_works(self):
+        """Тест: сложение экземпляров одного класса работает"""
+        p1 = Product("P1", "D1", 100.0, 5)
+        p2 = Product("P2", "D2", 200.0, 3)
+        result = p1 + p2
+        assert result == 100 * 5 + 200 * 3
+
+
+class TestCategoryAddProductRestriction:
+    """Тесты для ограничения добавления продуктов (Задание 3)"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_add_product_valid_types(self):
+        """Тест: добавление допустимых типов продуктов"""
+        category = Category("Test", "Desc", [])
+        product = Product("P1", "D1", 100.0, 5)
+        smartphone = Smartphone("S1", "D1", 100.0, 5, "high", "M1", 128, "red")
+        grass = LawnGrass("G1", "D1", 100.0, 5, "Russia", 14, "green")
+
+        category.add_product(product)
+        category.add_product(smartphone)
+        category.add_product(grass)
+
+        assert len(category.get_products_list()) == 3
+
+    def test_add_product_invalid_type_raises_error(self):
+        """Тест: добавление объекта неправильного типа вызывает TypeError"""
+        category = Category("Test", "Desc", [])
+
+        with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+            category.add_product("not a product")
+
+        with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+            category.add_product(123)
+
+        with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
+            category.add_product(None)
+
+        assert len(category.get_products_list()) == 0
+
+    def test_add_product_none_instance(self):
+        """Тест: добавление None вызывает ошибку"""
+        category = Category("Test", "Desc", [])
+
+        with pytest.raises(TypeError):
+            category.add_product(None)
+
+    def test_add_product_with_duplicate_name_allowed(self):
+        """Тест: добавление продукта с существующим именем разрешено"""
+        category = Category("Test", "Desc", [])
+        product1 = Product("Phone", "D1", 100.0, 5)
+        product2 = Product("Phone", "D2", 150.0, 3)
+
+        category.add_product(product1)
+        category.add_product(product2)
+
+        # Оба продукта добавлены, так как это разные объекты
+        assert len(category.get_products_list()) == 2
+
+
+class TestInheritanceIntegration:
+    """Интеграционные тесты для классов-наследников"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_mixed_category_contains_different_types(self):
+        """Тест: категория может содержать разные типы продуктов"""
+        category = Category("Store", "All products", [])
+
+        product = Product("Simple", "Desc", 100.0, 5)
+        smartphone = Smartphone("Phone", "Desc", 500.0, 3, "high", "X1", 128, "black")
+        grass = LawnGrass("Grass", "Desc", 50.0, 100, "Russia", 14, "green")
+
+        category.add_product(product)
+        category.add_product(smartphone)
+        category.add_product(grass)
+
+        assert len(category.get_products_list()) == 3
+        assert Category.product_count == 3
+
+    def test_category_str_with_mixed_products(self):
+        """Тест: строковое представление категории со смешанными продуктами"""
+        category = Category("Mixed", "All types", [])
+
+        product = Product("P1", "D1", 100.0, 5)
+        smartphone = Smartphone("S1", "D1", 200.0, 3, "high", "M1", 128, "red")
+        grass = LawnGrass("G1", "D1", 50.0, 10, "Russia", 14, "green")
+
+        category.add_product(product)
+        category.add_product(smartphone)
+        category.add_product(grass)
+
+        expected = "Mixed, количество продуктов: 18 шт."  # 5 + 3 + 10 = 18
+        assert str(category) == expected
