@@ -1,11 +1,49 @@
-class Product:
+from abc import ABC, abstractmethod
+from typing import Any
+
+
+class BaseProduct(ABC):
+    """Абстрактный базовый класс для всех продуктов."""
+
+    @abstractmethod
+    def __str__(self) -> str:
+        """Строковое представление продукта."""
+        pass
+
+    @abstractmethod
+    def __add__(self, other: 'BaseProduct') -> float:
+        """Сложение продуктов."""
+        pass
+
+    @property
+    @abstractmethod
+    def price(self) -> float:
+        """Геттер для цены."""
+        pass
+
+
+class PrintMixin:
+    """Миксин для вывода информации о создании объекта."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Выводит информацию о создании объекта."""
+        # Формируем строку с аргументами для вывода
+        if args:
+            args_str = ', '.join(repr(arg) for arg in args)
+            print(f"{self.__class__.__name__}({args_str})")
+        # НЕ вызываем super().__init__() здесь, чтобы избежать проблем с object
+
+
+class Product(BaseProduct, PrintMixin):
     """Класс, представляющий продукт."""
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
         self.description = description
-        self.__price = float(price)  # Приватный атрибут цены
+        self.__price = float(price)
         self.quantity = quantity
+        # Вызываем миксин явно
+        PrintMixin.__init__(self, name, description, price, quantity)
 
     @property
     def price(self) -> float:
@@ -31,26 +69,14 @@ class Product:
             print(f"Цена изменена на {value}")
 
     def __str__(self) -> str:
-        """
-        Строковое представление продукта.
-        Формат: "Название продукта, X руб. Остаток: X шт."
-        """
-        # Форматируем цену: убираем .0 если это целое число
-        if self.price == int(self.price):
-            price_str = str(int(self.price))
-        else:
-            price_str = str(self.price)
-        return f"{self.name}, {price_str} руб. Остаток: {self.quantity} шт."
+        """Строковое представление продукта."""
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other: 'Product') -> float:
-        """
-        Магический метод сложения двух продуктов.
-        Возвращает сумму произведений цены на количество.
-        """
-        if not isinstance(other, Product):
+        """Магический метод сложения двух продуктов."""
+        if not isinstance(other, BaseProduct):
             raise TypeError(f"Невозможно сложить Product с {type(other).__name__}")
-        # Задание 2: проверка, что объекты одного класса
-        if type(self) != type(other):
+        if not isinstance(other, type(self)):
             raise TypeError(f"Невозможно сложить товары разных классов: "
                             f"{type(self).__name__} и {type(other).__name__}")
         return (self.price * self.quantity) + (other.price * other.quantity)
@@ -63,7 +89,6 @@ class Product:
         price = float(product_data.get("price"))
         quantity = product_data.get("quantity", 0)
 
-        # Проверка дубликатов
         if existing_products is not None:
             for existing_product in existing_products:
                 if existing_product.name == name:
@@ -83,10 +108,10 @@ class Smartphone(Product):
     def __init__(self, name: str, description: str, price: float, quantity: int,
                  efficiency: str, model: str, memory: int, color: str) -> None:
         super().__init__(name, description, price, quantity)
-        self.efficiency = efficiency  # производительность
-        self.model = model  # модель
-        self.memory = memory  # объем встроенной памяти (ГБ)
-        self.color = color  # цвет
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
 
     def __str__(self) -> str:
         """Строковое представление смартфона."""
@@ -99,9 +124,9 @@ class LawnGrass(Product):
     def __init__(self, name: str, description: str, price: float, quantity: int,
                  country: str, germination_period: int, color: str) -> None:
         super().__init__(name, description, price, quantity)
-        self.country = country  # страна-производитель
-        self.germination_period = germination_period  # срок прорастания (дней)
-        self.color = color  # цвет
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
 
     def __str__(self) -> str:
         """Строковое представление газонной травы."""

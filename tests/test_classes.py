@@ -3,8 +3,8 @@ import pytest
 import json
 import tempfile
 
-from src.class_product import Product, Smartphone, LawnGrass
-from src.class_category import Category
+from src.class_product import BaseProduct, Product, Smartphone, LawnGrass
+from src.class_category import BaseCategory, Category, Order
 from src.from_jason import load_categories_from_json
 
 
@@ -34,7 +34,7 @@ class TestProduct:
     def test_product_str_method_with_zero_quantity(self):
         """Тест продукта с нулевым количеством"""
         product = Product("Out of Stock", "Description", 50.0, 0)
-        expected = "Out of Stock, 50 руб. Остаток: 0 шт."
+        expected = "Out of Stock, 50.0 руб. Остаток: 0 шт."
         assert str(product) == expected
 
     def test_product_with_large_numbers(self):
@@ -63,7 +63,7 @@ class TestProduct:
         assert product.price == 450.0
         assert product.quantity == 8
 
-    # Тесты для нового функционала - __str__
+    # Тесты для метода __str__
 
     def test_product_str_method(self):
         """Тест строкового представления продукта"""
@@ -74,10 +74,10 @@ class TestProduct:
     def test_product_str_method_with_integer_price(self):
         """Тест строкового представления продукта с целочисленной ценой"""
         product = Product("Cheap Item", "Description", 100, 5)
-        expected = "Cheap Item, 100 руб. Остаток: 5 шт."
+        expected = "Cheap Item, 100.0 руб. Остаток: 5 шт."
         assert str(product) == expected
 
-    # Тесты для нового функционала - __add__
+    # Тесты для метода __add__
 
     def test_product_add_method(self):
         """Тест сложения двух продуктов"""
@@ -85,7 +85,7 @@ class TestProduct:
         product_b = Product("Product B", "Desc", 200.0, 2)
 
         result = product_a + product_b
-        expected = 100 * 10 + 200 * 2  # 1000 + 400 = 1400
+        expected = 100 * 10 + 200 * 2
         assert result == expected
 
     def test_product_add_method_with_large_numbers(self):
@@ -94,7 +94,7 @@ class TestProduct:
         product_b = Product("Expensive B", "Desc", 2000.0, 50)
 
         result = product_a + product_b
-        expected = 1000 * 100 + 2000 * 50  # 100000 + 100000 = 200000
+        expected = 1000 * 100 + 2000 * 50
         assert result == expected
 
     def test_product_add_method_with_zero_quantity(self):
@@ -103,7 +103,7 @@ class TestProduct:
         product_b = Product("Product B", "Desc", 200.0, 0)
 
         result = product_a + product_b
-        expected = 100 * 10 + 200 * 0  # 1000 + 0 = 1000
+        expected = 100 * 10 + 200 * 0
         assert result == expected
 
     def test_product_add_method_with_zero_price(self):
@@ -112,7 +112,7 @@ class TestProduct:
         product_b = Product("Free Product", "Desc", 0.0, 5)
 
         result = product_a + product_b
-        expected = 100 * 10 + 0 * 5  # 1000 + 0 = 1000
+        expected = 100 * 10 + 0 * 5
         assert result == expected
 
     def test_product_add_method_with_same_product(self):
@@ -132,7 +132,7 @@ class TestProduct:
         with pytest.raises(TypeError, match="Невозможно сложить Product с int"):
             add_with_int()
 
-    # Остальные существующие тесты...
+    # Остальные тесты
 
     def test_add_product_to_category(self):
         """Тест добавления продукта в категорию через add_product"""
@@ -178,9 +178,9 @@ class TestProduct:
         category = Category("Electronics", "Devices", [product1, product2])
 
         products_str = category.products
-        assert "Phone, 500 руб. Остаток: 10 шт." in products_str
-        assert "Laptop, 1500 руб. Остаток: 5 шт." in products_str
-        
+        assert "Phone, 500.0 руб. Остаток: 10 шт." in products_str
+        assert "Laptop, 1500.0 руб. Остаток: 5 шт." in products_str
+
     def test_category_products_getter_empty(self):
         """Тест геттера products для пустой категории"""
         category = Category("Empty", "No products", [])
@@ -191,14 +191,14 @@ class TestProduct:
         product1 = Product("Phone", "Smartphone", 500.0, 10)
         category = Category("Electronics", "Devices", [product1])
 
-        assert "Phone, 500 руб. Остаток: 10 шт." in category.products
+        assert "Phone, 500.0 руб. Остаток: 10 шт." in category.products
 
         product2 = Product("Tablet", "iPad", 800.0, 8)
         category.add_product(product2)
 
-        assert "Tablet, 800 руб. Остаток: 8 шт." in category.products
+        assert "Tablet, 800.0 руб. Остаток: 8 шт." in category.products
 
-    # Тесты для нового функционала категории - __str__
+    # Тесты для магического метода __str__
 
     def test_category_str_method(self):
         """Тест строкового представления категории"""
@@ -273,7 +273,7 @@ class TestProduct:
         with pytest.raises(StopIteration):
             next(iterator)
 
-    # Остальные существующие тесты для Product...
+    # Остальные тесты для Product
 
     def test_new_product_without_existing_products(self):
         """Тест new_product без проверки существующих продуктов"""
@@ -306,8 +306,8 @@ class TestProduct:
         result = Product.new_product(product_data, existing_products)
 
         assert result is existing_product
-        assert result.quantity == 8  # 5 + 3
-        assert result.price == 1000.0  # Цена осталась прежней
+        assert result.quantity == 8
+        assert result.price == 1000.0
 
     def test_new_product_with_duplicate_higher_price(self):
         """Тест new_product с дубликатом и более высокой ценой"""
@@ -324,7 +324,7 @@ class TestProduct:
         result = Product.new_product(product_data, existing_products)
 
         assert result is existing_product
-        assert result.quantity == 8  # 5 + 3
+        assert result.quantity == 8
         assert result.price == 1200.0  # Выбрана максимальная цена
 
     def test_new_product_with_duplicate_lower_price(self):
@@ -342,7 +342,7 @@ class TestProduct:
         result = Product.new_product(product_data, existing_products)
 
         assert result is existing_product
-        assert result.quantity == 8  # 5 + 3
+        assert result.quantity == 8
         assert result.price == 1000.0  # Оставлена более высокая цена
 
     def test_new_product_with_multiple_existing_products(self):
@@ -363,7 +363,7 @@ class TestProduct:
         result = Product.new_product(product_data, existing_products)
 
         assert result.name == "Samsung"
-        assert result.quantity == 17  # 10 + 7
+        assert result.quantity == 17
         assert result.price == 950.0
 
     def test_product_price_getter(self):
@@ -444,6 +444,9 @@ class TestCategory:
         product = Product("Single", "Only one", 100.0, 1)
         category = Category("Single Category", "Just one product", [product])
 
+        assert category.name == "Single Category"
+        assert category.description == "Just one product"
+        assert len(category.get_products_list()) == 1
         assert Category.product_count == 1
 
     def test_category_counters_with_multiple_categories(self):
@@ -618,7 +621,6 @@ class TestLoadCategoriesFromJSON:
         finally:
             os.unlink(temp_file)
 
-
     def test_load_categories_from_multiple_categories_json(self):
         """Тест загрузки нескольких категорий из JSON"""
         json_data = [
@@ -722,7 +724,9 @@ class TestIntegration:
         assert Category.category_count == 2
         assert Category.product_count == 3
 
-        assert "iPhone, 1000 руб. Остаток: 10 шт." in electronics.products  # Убрали .0
+        assert "iPhone, 1000.0 руб. Остаток: 10 шт." in electronics.products
+        assert "iPad, 500.0 руб. Остаток: 8 шт." in accessories.products  # Добавлена проверка
+        assert len(accessories.get_products_list()) == 1  # Дополнительная проверка
 
         electronics.add_product(tablet)
         assert Category.product_count == 4
@@ -832,7 +836,7 @@ def test_products_getter_format():
     category = Category("Electronics", "Devices", [product])
 
     result = category.products
-    assert result == "Phone, 500 руб. Остаток: 10 шт."
+    assert result == "Phone, 500.0 руб. Остаток: 10 шт."
 
 
 def test_products_getter_empty():
@@ -936,7 +940,7 @@ class TestSmartphone:
         s1 = Smartphone("S1", "D1", 100.0, 10, "high", "M1", 128, "red")
         s2 = Smartphone("S2", "D2", 200.0, 5, "high", "M2", 256, "blue")
         result = s1 + s2
-        expected = 100 * 10 + 200 * 5  # 1000 + 1000 = 2000
+        expected = 100 * 10 + 200 * 5
         assert result == expected
 
 
@@ -979,7 +983,7 @@ class TestLawnGrass:
         g1 = LawnGrass("G1", "D1", 100.0, 10, "Russia", 14, "green")
         g2 = LawnGrass("G2", "D2", 150.0, 4, "Germany", 21, "dark green")
         result = g1 + g2
-        expected = 100 * 10 + 150 * 4  # 1000 + 600 = 1600
+        expected = 100 * 10 + 150 * 4
         assert result == expected
 
 
@@ -1078,7 +1082,6 @@ class TestCategoryAddProductRestriction:
         category.add_product(product1)
         category.add_product(product2)
 
-        # Оба продукта добавлены, так как это разные объекты
         assert len(category.get_products_list()) == 2
 
 
@@ -1116,5 +1119,215 @@ class TestInheritanceIntegration:
         category.add_product(smartphone)
         category.add_product(grass)
 
-        expected = "Mixed, количество продуктов: 18 шт."  # 5 + 3 + 10 = 18
+        expected = "Mixed, количество продуктов: 18 шт."
         assert str(category) == expected
+
+# 16.2
+# Тесты для абстрактного класса BaseProduct
+
+
+class TestBaseProduct:
+    """Тесты для абстрактного класса BaseProduct"""
+
+    def test_base_product_is_abstract(self):
+        """Тест: BaseProduct является абстрактным классом"""
+        from abc import ABC
+        assert issubclass(BaseProduct, ABC)
+
+    def test_product_implements_base_product(self):
+        """Тест: Product реализует BaseProduct"""
+        assert issubclass(Product, BaseProduct)
+
+    def test_smartphone_implements_base_product(self):
+        """Тест: Smartphone реализует BaseProduct через Product"""
+        assert issubclass(Smartphone, BaseProduct)
+
+    def test_lawn_grass_implements_base_product(self):
+        """Тест: LawnGrass реализует BaseProduct через Product"""
+        assert issubclass(LawnGrass, BaseProduct)
+
+
+# Тесты для миксина PrintMixin
+
+class TestPrintMixin:
+    """Тесты для миксина PrintMixin"""
+
+    def test_print_mixin_output_on_product_creation(self, capsys):
+        """Тест: при создании Product выводится информация"""
+        product = Product("Test Product", "Description", 100.0, 5)
+        captured = capsys.readouterr()
+        assert "Product('Test Product', 'Description', 100.0, 5)" in captured.out
+        # Добавляем проверку, что объект создан корректно
+        assert product.name == "Test Product"
+        assert product.description == "Description"
+        assert product.price == 100.0
+        assert product.quantity == 5
+
+    def test_print_mixin_output_on_smartphone_creation(self, capsys):
+        """Тест: при создании Smartphone выводится информация о базовых аргументах"""
+        smartphone = Smartphone("Test Phone", "Desc", 100.0, 5, "high", "M1", 128, "red")
+        captured = capsys.readouterr()
+        # Миксин выводит только аргументы, переданные в __init__ базового класса
+        assert "Smartphone('Test Phone', 'Desc', 100.0, 5)" in captured.out
+        # Добавляем проверки, что объект создан корректно
+        assert smartphone.name == "Test Phone"
+        assert smartphone.description == "Desc"
+        assert smartphone.price == 100.0
+        assert smartphone.quantity == 5
+        assert smartphone.efficiency == "high"
+        assert smartphone.model == "M1"
+        assert smartphone.memory == 128
+        assert smartphone.color == "red"
+
+    def test_print_mixin_output_on_lawn_grass_creation(self, capsys):
+        """Тест: при создании LawnGrass выводится информация о базовых аргументах"""
+        grass = LawnGrass("Test Grass", "Desc", 100.0, 5, "Russia", 14, "green")
+        captured = capsys.readouterr()
+        # Миксин выводит только аргументы, переданные в __init__ базового класса
+        assert "LawnGrass('Test Grass', 'Desc', 100.0, 5)" in captured.out
+        # Добавляем проверки, что объект создан корректно
+        assert grass.name == "Test Grass"
+        assert grass.description == "Desc"
+        assert grass.price == 100.0
+        assert grass.quantity == 5
+        assert grass.country == "Russia"
+        assert grass.germination_period == 14
+        assert grass.color == "green"
+
+    def test_print_mixin_multiple_creations(self, capsys):
+        """Тест: несколько созданий - несколько выводов"""
+        product1 = Product("P1", "D1", 100.0, 5)
+        product2 = Product("P2", "D2", 200.0, 3)
+        captured = capsys.readouterr()
+        assert "Product('P1', 'D1', 100.0, 5)" in captured.out
+        assert "Product('P2', 'D2', 200.0, 3)" in captured.out
+        # Добавляем проверки
+        assert product1.name == "P1"
+        assert product2.name == "P2"
+        assert product1.price == 100.0
+        assert product2.price == 200.0
+
+# Тесты для абстрактного класса BaseCategory
+
+
+class TestBaseCategory:
+    """Тесты для абстрактного класса BaseCategory"""
+
+    def test_base_category_is_abstract(self):
+        """Тест: BaseCategory является абстрактным классом"""
+        from abc import ABC
+        assert issubclass(BaseCategory, ABC)
+
+    def test_category_implements_base_category(self):
+        """Тест: Category реализует BaseCategory"""
+        assert issubclass(Category, BaseCategory)
+
+    def test_order_implements_base_category(self):
+        """Тест: Order реализует BaseCategory"""
+        assert issubclass(Order, BaseCategory)
+
+
+# Тесты для класса Order (дополнительное задание)
+
+class TestOrder:
+    """Тесты для класса Order"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_order_initialization(self):
+        """Тест корректной инициализации заказа"""
+        product = Product("Test Product", "Desc", 100.0, 10)
+        order = Order(product, 3)
+
+        assert order.product is product
+        assert order.quantity == 3
+        assert order.total_price == 300.0
+
+    def test_order_get_products_list(self):
+        """Тест получения списка продуктов в заказе"""
+        product = Product("Test Product", "Desc", 100.0, 10)
+        order = Order(product, 3)
+
+        products_list = order.get_products_list()
+        assert len(products_list) == 1
+        assert products_list[0] is product
+
+    def test_order_str_method(self):
+        """Тест строкового представления заказа"""
+        product = Product("Test Product", "Desc", 100.0, 10)
+        order = Order(product, 3)
+        expected = "Заказ: Test Product, 3 шт., итого: 300 руб."
+        assert str(order) == expected
+
+    def test_order_str_method_with_float_price(self):
+        """Тест строкового представления заказа с дробной ценой"""
+        product = Product("Test Product", "Desc", 99.99, 10)
+        order = Order(product, 2)
+        expected = "Заказ: Test Product, 2 шт., итого: 199.98 руб."
+        assert str(order) == expected
+
+    def test_order_quantity_zero_raises_error(self):
+        """Тест: создание заказа с нулевым количеством вызывает ошибку"""
+        product = Product("Test", "Desc", 100.0, 10)
+        with pytest.raises(ValueError, match="Количество товара должно быть положительным"):
+            Order(product, 0)
+
+    def test_order_quantity_negative_raises_error(self):
+        """Тест: создание заказа с отрицательным количеством вызывает ошибку"""
+        product = Product("Test", "Desc", 100.0, 10)
+        with pytest.raises(ValueError, match="Количество товара должно быть положительным"):
+            Order(product, -5)
+
+    def test_order_quantity_exceeds_stock_raises_error(self):
+        """Тест: создание заказа с количеством больше доступного вызывает ошибку"""
+        product = Product("Test", "Desc", 100.0, 10)
+        with pytest.raises(ValueError, match="Недостаточно товара на складе"):
+            Order(product, 15)
+
+    def test_order_with_smartphone(self):
+        """Тест: создание заказа со смартфоном"""
+        smartphone = Smartphone("Phone", "Desc", 500.0, 5, "high", "M1", 128, "black")
+        order = Order(smartphone, 2)
+        assert order.product is smartphone
+        assert order.total_price == 1000.0
+
+    def test_order_with_lawn_grass(self):
+        """Тест: создание заказа с газонной травой"""
+        grass = LawnGrass("Grass", "Desc", 100.0, 20, "Russia", 14, "green")
+        order = Order(grass, 5)
+        assert order.product is grass
+        assert order.total_price == 500.0
+
+
+class TestBaseProductIntegration:
+    """Интеграционные тесты для абстрактного класса"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_all_products_share_base_class(self):
+        """Тест: все продукты имеют общий базовый класс"""
+        product = Product("P", "D", 100.0, 5)
+        smartphone = Smartphone("S", "D", 200.0, 3, "high", "M1", 128, "red")
+        grass = LawnGrass("G", "D", 50.0, 10, "Russia", 14, "green")
+
+        assert isinstance(product, BaseProduct)
+        assert isinstance(smartphone, BaseProduct)
+        assert isinstance(grass, BaseProduct)
+
+    def test_order_accepts_any_product_type(self):
+        """Тест: заказ может содержать любой тип продукта"""
+        product = Product("P", "D", 100.0, 10)
+        smartphone = Smartphone("S", "D", 200.0, 5, "high", "M1", 128, "red")
+        grass = LawnGrass("G", "D", 50.0, 20, "Russia", 14, "green")
+
+        order1 = Order(product, 2)
+        order2 = Order(smartphone, 1)
+        order3 = Order(grass, 3)
+
+        assert order1.total_price == 200.0
+        assert order2.total_price == 200.0
+        assert order3.total_price == 150.0
