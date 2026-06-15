@@ -94,7 +94,7 @@ class TestProduct:
     def test_product_add_method_with_zero_quantity(self):
         """Тест сложения продуктов, где один имеет нулевое количество"""
         product_a = Product("Product A", "Desc", 100.0, 10)
-        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
             Product("Product B", "Desc", 200.0, 0)
 
         product_b = Product("Product B", "Desc", 200.0, 1)
@@ -1266,20 +1266,23 @@ class TestOrder:
         assert str(order) == expected
 
     def test_order_quantity_zero_raises_error(self):
-        """Тест: создание заказа с нулевым количеством вызывает ошибку"""
+        """Тест: создание заказа с нулевым количеством вызывает ZeroQuantityError"""
         product = Product("Test", "Desc", 100.0, 10)
-        with pytest.raises(ValueError, match="Количество товара должно быть положительным"):
+        # Исправлено: правильное сообщение
+        with pytest.raises(ZeroQuantityError, match="Количество товара в заказе должно быть положительным"):
             Order(product, 0)
 
     def test_order_quantity_negative_raises_error(self):
-        """Тест: создание заказа с отрицательным количеством вызывает ошибку"""
+        """Тест: создание заказа с отрицательным количеством вызывает ZeroQuantityError"""
         product = Product("Test", "Desc", 100.0, 10)
-        with pytest.raises(ValueError, match="Количество товара должно быть положительным"):
+        # Исправлено: правильное сообщение
+        with pytest.raises(ZeroQuantityError, match="Количество товара в заказе должно быть положительным"):
             Order(product, -5)
 
     def test_order_quantity_exceeds_stock_raises_error(self):
-        """Тест: создание заказа с количеством больше доступного вызывает ошибку"""
+        """Тест: создание заказа с количеством больше доступного вызывает ValueError"""
         product = Product("Test", "Desc", 100.0, 10)
+        # Исправлено: должно быть ValueError, а не ZeroQuantityError
         with pytest.raises(ValueError, match="Недостаточно товара на складе"):
             Order(product, 15)
 
@@ -1337,12 +1340,12 @@ class TestZeroQuantity:
 
     def test_product_with_zero_quantity_raises_error(self):
         """Тест: создание продукта с нулевым количеством вызывает ValueError"""
-        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
             Product("Invalid Product", "Description", 100.0, 0)
 
     def test_product_with_negative_quantity_raises_error(self):
         """Тест: создание продукта с отрицательным количеством вызывает ValueError"""
-        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
             Product("Invalid Product", "Description", 100.0, -5)
 
     def test_product_with_positive_quantity_works(self):
@@ -1352,12 +1355,12 @@ class TestZeroQuantity:
 
     def test_smartphone_with_zero_quantity_raises_error(self):
         """Тест: создание смартфона с нулевым количеством вызывает ValueError"""
-        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
             Smartphone("Phone", "Desc", 100.0, 0, "high", "M1", 128, "red")
 
     def test_lawn_grass_with_zero_quantity_raises_error(self):
         """Тест: создание газонной травы с нулевым количеством вызывает ValueError"""
-        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
             LawnGrass("Grass", "Desc", 100.0, 0, "Russia", 14, "green")
 
 
@@ -1422,7 +1425,7 @@ class TestZeroQuantityIntegration:
 
     def test_cannot_add_zero_quantity_product_to_category(self):
         """Тест: нельзя добавить в категорию продукт, созданный с нулевым количеством"""
-        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
             Product("Invalid", "Desc", 100.0, 0)
 
     def test_new_product_method_with_zero_quantity_raises_error(self):
@@ -1433,7 +1436,7 @@ class TestZeroQuantityIntegration:
             "price": 100.0,
             "quantity": 0
         }
-        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
             Product.new_product(product_data)
 
     def test_middle_price_with_zero_quantity_products(self):
