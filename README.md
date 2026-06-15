@@ -46,11 +46,11 @@
 Name                    Stmts   Miss  Cover
 -------------------------------------------
 src\__init__.py             4      0   100%
-src\class_category.py      73      5    93%
+src\class_category.py      90      5    94%
 src\class_product.py       85      3    96%
 src\from_jason.py          16      0   100%
 -------------------------------------------
-TOTAL                     178      8    96%
+TOTAL                     195      8    96%
 
 
 ### Пример работы функции `load_categories_from_json`:
