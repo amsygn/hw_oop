@@ -3,7 +3,7 @@ import pytest
 import json
 import tempfile
 
-from src.class_product import BaseProduct, Product, Smartphone, LawnGrass
+from src.class_product import BaseProduct, Product, Smartphone, LawnGrass, ZeroQuantityError
 from src.class_category import BaseCategory, Category, Order
 from src.from_jason import load_categories_from_json
 
@@ -1444,3 +1444,55 @@ class TestZeroQuantityIntegration:
         category = Category("Test", "Desc", [product1, product2])
         expected = (100.0 + 200.0) / 2
         assert category.middle_price() == expected
+
+
+from src.class_product import ZeroQuantityError
+
+
+class TestZeroQuantityError:
+    """Тесты для исключения ZeroQuantityError"""
+
+    def test_zero_quantity_error_raised_on_product_creation(self):
+        """Тест: создание продукта с нулевым количеством вызывает ZeroQuantityError"""
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
+            Product("Invalid", "Desc", 100.0, 0)
+
+    def test_zero_quantity_error_raised_on_add_to_category(self):
+        """Тест: добавление продукта с нулевым количеством в категорию вызывает ZeroQuantityError"""
+        product = Product("Valid", "Desc", 100.0, 1)
+        product.quantity = 0  # Изменяем количество после создания
+        category = Category("Test", "Desc", [])
+
+        with pytest.raises(ZeroQuantityError, match="Товар с нулевым количеством не может быть добавлен"):
+            category.add_product(product)
+
+    def test_zero_quantity_error_raised_on_order_creation(self):
+        """Тест: создание заказа с нулевым количеством вызывает ZeroQuantityError"""
+        product = Product("Valid", "Desc", 100.0, 10)
+
+        with pytest.raises(ZeroQuantityError, match="Количество товара в заказе должно быть положительным"):
+            Order(product, 0)
+
+    def test_successful_add_product_message(self, capsys):
+        """Тест: при успешном добавлении выводится сообщение"""
+        product = Product("Success", "Desc", 100.0, 5)
+        category = Category("Test", "Desc", [])
+
+        category.add_product(product)
+        captured = capsys.readouterr()
+
+        assert "Товар 'Success' успешно добавлен в категорию" in captured.out
+        assert "Обработка добавления товара завершена" in captured.out
+
+    def test_failed_add_product_message(self, capsys):
+        """Тест: при неудачном добавлении выводится сообщение об ошибке"""
+        product = Product("Fail", "Desc", 100.0, 1)
+        product.quantity = 0
+        category = Category("Test", "Desc", [])
+
+        with pytest.raises(ZeroQuantityError):
+            category.add_product(product)
+
+        captured = capsys.readouterr()
+        assert "Ошибка: Товар с нулевым количеством не может быть добавлен" in captured.out
+        assert "Обработка добавления товара завершена" in captured.out
