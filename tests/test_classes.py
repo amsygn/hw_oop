@@ -1056,13 +1056,13 @@ class TestCategoryAddProductRestriction:
         category = Category("Test", "Desc", [])
 
         with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
-            category.add_product("not a product")
+            category.add_product("not a product")  # type: ignore
 
         with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
-            category.add_product(123)
+            category.add_product(123)  # type: ignore
 
         with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product"):
-            category.add_product(None)
+            category.add_product(None)  # type: ignore
 
         assert len(category.get_products_list()) == 0
 
@@ -1071,7 +1071,7 @@ class TestCategoryAddProductRestriction:
         category = Category("Test", "Desc", [])
 
         with pytest.raises(TypeError):
-            category.add_product(None)
+            category.add_product(None)  # type: ignore
 
     def test_add_product_with_duplicate_name_allowed(self):
         """Тест: добавление продукта с существующим именем разрешено"""
@@ -1331,3 +1331,119 @@ class TestBaseProductIntegration:
         assert order1.total_price == 200.0
         assert order2.total_price == 200.0
         assert order3.total_price == 150.0
+
+
+# 17.1 Тесты для проверки нулевого количества
+
+class TestZeroQuantity:
+    """Тесты для проверки создания продукта с нулевым количеством"""
+
+    def test_product_with_zero_quantity_raises_error(self):
+        """Тест: создание продукта с нулевым количеством вызывает ValueError"""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Product("Invalid Product", "Description", 100.0, 0)
+
+    def test_product_with_negative_quantity_raises_error(self):
+        """Тест: создание продукта с отрицательным количеством вызывает ValueError"""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Product("Invalid Product", "Description", 100.0, -5)
+
+    def test_product_with_positive_quantity_works(self):
+        """Тест: создание продукта с положительным количеством работает"""
+        product = Product("Valid Product", "Description", 100.0, 5)
+        assert product.quantity == 5
+
+    def test_smartphone_with_zero_quantity_raises_error(self):
+        """Тест: создание смартфона с нулевым количеством вызывает ValueError"""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Smartphone("Phone", "Desc", 100.0, 0, "high", "M1", 128, "red")
+
+    def test_lawn_grass_with_zero_quantity_raises_error(self):
+        """Тест: создание газонной травы с нулевым количеством вызывает ValueError"""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            LawnGrass("Grass", "Desc", 100.0, 0, "Russia", 14, "green")
+
+
+class TestMiddlePrice:
+    """Тесты для метода middle_price в классе Category"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_middle_price_with_products(self):
+        """Тест: подсчет среднего ценника при наличии товаров"""
+        product1 = Product("P1", "D1", 100.0, 5)
+        product2 = Product("P2", "D2", 200.0, 3)
+        product3 = Product("P3", "D3", 300.0, 7)
+
+        category = Category("Test Cat", "Desc", [product1, product2, product3])
+
+        expected = (100.0 + 200.0 + 300.0) / 3
+        assert category.middle_price() == expected
+
+    def test_middle_price_with_single_product(self):
+        """Тест: подсчет среднего ценника при одном товаре"""
+        product = Product("P1", "D1", 100.0, 5)
+        category = Category("Test Cat", "Desc", [product])
+
+        assert category.middle_price() == 100.0
+
+    def test_middle_price_with_empty_category(self):
+        """Тест: подсчет среднего ценника в пустой категории"""
+        category = Category("Empty Cat", "Desc", [])
+
+        assert category.middle_price() == 0.0
+
+    def test_middle_price_with_zero_price_products(self):
+        """Тест: подсчет среднего ценника с товарами нулевой цены"""
+        product1 = Product("P1", "D1", 0.0, 5)
+        product2 = Product("P2", "D2", 0.0, 3)
+        category = Category("Test Cat", "Desc", [product1, product2])
+
+        assert category.middle_price() == 0.0
+
+    def test_middle_price_after_adding_product(self):
+        """Тест: подсчет среднего ценника после добавления товара"""
+        product1 = Product("P1", "D1", 100.0, 5)
+        category = Category("Test Cat", "Desc", [product1])
+
+        assert category.middle_price() == 100.0
+
+        product2 = Product("P2", "D2", 200.0, 3)
+        category.add_product(product2)
+
+        assert category.middle_price() == 150.0
+
+
+class TestZeroQuantityIntegration:
+    """Интеграционные тесты для нулевого количества"""
+
+    def setup_method(self):
+        Category.category_count = 0
+        Category.product_count = 0
+
+    def test_cannot_add_zero_quantity_product_to_category(self):
+        """Тест: нельзя добавить в категорию продукт, созданный с нулевым количеством"""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Product("Invalid", "Desc", 100.0, 0)
+
+    def test_new_product_method_with_zero_quantity_raises_error(self):
+        """Тест: метод new_product с нулевым количеством вызывает ошибку"""
+        product_data = {
+            "name": "New Product",
+            "description": "Description",
+            "price": 100.0,
+            "quantity": 0
+        }
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Product.new_product(product_data)
+
+    def test_middle_price_with_zero_quantity_products(self):
+        """Тест: средний ценник для категории с товарами разного количества"""
+        product1 = Product("P1", "D1", 100.0, 5)
+        product2 = Product("P2", "D2", 200.0, 3)
+
+        category = Category("Test", "Desc", [product1, product2])
+        expected = (100.0 + 200.0) / 2
+        assert category.middle_price() == expected
