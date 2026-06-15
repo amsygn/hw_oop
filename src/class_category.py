@@ -47,7 +47,7 @@ class Category(BaseCategory):
         """Метод для добавления продукта в категорию."""
         if not isinstance(product, Product):
             raise TypeError(
-                f"Можно добавлять только объекты класса Product или его наследников."
+                f"Можно добавлять только объекты класса Product или его наследников. "
                 f"Получен {type(product).__name__}"
             )
         self.__products.append(product)
@@ -65,6 +65,19 @@ class Category(BaseCategory):
     def __iter__(self):
         """Возвращает итератор для перебора товаров категории."""
         return CategoryIterator(self)
+
+    def middle_price(self) -> float:
+        """
+        Задание 2: подсчет среднего ценника всех товаров в категории.
+        Если в категории нет товаров, возвращает 0.
+        """
+        try:
+            if len(self.__products) == 0:
+                return 0.0
+            total_price = sum(product.price for product in self.__products)
+            return total_price / len(self.__products)
+        except ZeroDivisionError:
+            return 0.0
 
 
 class CategoryIterator:
