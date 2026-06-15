@@ -1,10 +1,21 @@
 from src.class_category import Category, Order
-from src.class_product import Product, Smartphone, LawnGrass
+from src.class_product import Product, Smartphone, LawnGrass, ZeroQuantityError
 from src.from_jason import load_categories_from_json
 
 if __name__ == '__main__':
     # Демонстрация работы миксина (при создании объектов будет вывод в консоль)
     print("=== Демонстрация работы миксина (вывод при создании объектов) ===\n")
+
+    # Демонстрация обработки нулевого количества (Задание 1)
+    print("=== Проверка обработки товара с нулевым количеством ===")
+    try:
+        product_invalid = Product("Бракованный товар", "Неверное количество", 1000.0, 0)
+    except ValueError as e:
+        print(f"Возникла ошибка ValueError: {e}")
+        print("Программа прервана при попытке добавить продукт с нулевым количеством")
+    else:
+        print("Не возникла ошибка ValueError при попытке добавить продукт с нулевым количеством")
+    print()
 
     # Товары
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
@@ -57,6 +68,13 @@ if __name__ == '__main__':
     print('Категория:', category2.name)
     print('Описание:', category2.description)
     print('Товары в наличии:', category2.products)
+    print()
+
+    # Демонстрация метода middle_price (Задание 2)
+    print("=== Средний ценник товаров ===")
+    print(f"Средний ценник в категории 'Смартфоны': {category1.middle_price()}")
+    category_empty = Category("Пустая категория", "Категория без продуктов", [])
+    print(f"Средний ценник в пустой категории: {category_empty.middle_price()}")
     print()
 
     products_list = category2.get_products_list()
@@ -132,7 +150,7 @@ if __name__ == '__main__':
     except TypeError as e:
         print(f"Ошибка (ожидаемо): {e}")
 
-    # Демонстрация работы заказа (дополнительное задание)
+    # Демонстрация работы заказа
     print("\n" + "="*50)
     print("ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ")
     print("••• Демонстрация работы класса Order •••")
