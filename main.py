@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
     print("\n••• Попытка добавить объект неправильного типа •••")
     try:
-        electronics_category.add_product("это строка, а не продукт")
+        electronics_category.add_product("это строка, а не продукт")  # type: ignore
     except TypeError as e:
         print(f"Ошибка (ожидаемо): {e}")
 
