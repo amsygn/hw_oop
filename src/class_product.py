@@ -42,9 +42,8 @@ class Product(BaseProduct, PrintMixin):
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         """Инициализация продукта с проверкой количества."""
-        # Задание 1: проверка на нулевое количество
         if quantity <= 0:
-            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+            raise ZeroQuantityError("Товар с нулевым количеством не может быть добавлен")
 
         self.name = name
         self.description = description

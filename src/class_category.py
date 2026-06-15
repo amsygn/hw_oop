@@ -1,7 +1,6 @@
 from typing import List
 from abc import ABC, abstractmethod
-from src.class_product import Product
-
+from src.class_product import Product, ZeroQuantityError
 
 class BaseCategory(ABC):
     """Абстрактный базовый класс для категорий и заказов."""
@@ -44,14 +43,36 @@ class Category(BaseCategory):
         return "\n".join(result)
 
     def add_product(self, product: Product) -> None:
-        """Метод для добавления продукта в категорию."""
-        if not isinstance(product, Product):
-            raise TypeError(
-                f"Можно добавлять только объекты класса Product или его наследников. "
-                f"Получен {type(product).__name__}"
-            )
-        self.__products.append(product)
-        Category.product_count += 1
+        """
+        Метод для добавления продукта в категорию.
+        С обработкой исключений для нулевого количества.
+        """
+        try:
+            # Сначала проверяем, является ли объект продуктом (Задание 3)
+            if not isinstance(product, Product):
+                raise TypeError(
+                    f"Можно добавлять только объекты класса Product или его наследников. "
+                    f"Получен {type(product).__name__}"
+                )
+
+            # Затем проверяем количество (Дополнительное задание)
+            if product.quantity <= 0:
+                raise ZeroQuantityError(
+                    f"Товар с нулевым количеством не может быть добавлен в категорию"
+                )
+
+            self.__products.append(product)
+            Category.product_count += 1
+            print(f"Товар '{product.name}' успешно добавлен в категорию")
+
+        except ZeroQuantityError as e:
+            print(f"Ошибка: {e}")
+            raise
+        except TypeError as e:
+            print(f"Ошибка типа: {e}")
+            raise
+        finally:
+            print("Обработка добавления товара завершена")
 
     def get_products_list(self) -> List[Product]:
         """Метод для получения списка продуктов."""
@@ -99,16 +120,25 @@ class CategoryIterator:
 
 
 class Order(BaseCategory):
-    """Класс, представляющий заказ (дополнительное задание)."""
+    """Класс, представляющий заказ."""
 
     def __init__(self, product: Product, quantity: int) -> None:
-        if quantity <= 0:
-            raise ValueError("Количество товара должно быть положительным")
-        if quantity > product.quantity:
-            raise ValueError(f"Недостаточно товара на складе. Доступно: {product.quantity}")
-        self.product = product
-        self.quantity = quantity
-        self.total_price = product.price * quantity
+        try:
+            if quantity <= 0:
+                raise ZeroQuantityError("Количество товара в заказе должно быть положительным")
+            if quantity > product.quantity:
+                raise ValueError(f"Недостаточно товара на складе. Доступно: {product.quantity}")
+
+            self.product = product
+            self.quantity = quantity
+            self.total_price = product.price * quantity
+            print(f"Заказ на товар '{product.name}' в количестве {quantity} шт. успешно создан")
+
+        except ZeroQuantityError as e:
+            print(f"Ошибка: {e}")
+            raise
+        finally:
+            print("Обработка создания заказа завершена")
 
     def get_products_list(self) -> List[Product]:
         """Возвращает список продуктов в заказе."""
