@@ -17,7 +17,6 @@ if __name__ == '__main__':
         print("Не возникла ошибка при попытке добавить продукт с нулевым количеством")
     print()
 
-
     # Товары
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)

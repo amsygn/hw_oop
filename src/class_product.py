@@ -83,8 +83,10 @@ class Product(BaseProduct, PrintMixin):
         if not isinstance(other, BaseProduct):
             raise TypeError(f"Невозможно сложить Product с {type(other).__name__}")
         if not isinstance(other, type(self)):
-            raise TypeError(f"Невозможно сложить товары разных классов: "
-                           f"{type(self).__name__} и {type(other).__name__}")
+            raise TypeError(
+                f"Невозможно сложить товары разных классов: "
+                f"{type(self).__name__} и {type(other).__name__}"
+            )
         return (self.price * self.quantity) + (other.price * other.quantity)
 
     @classmethod

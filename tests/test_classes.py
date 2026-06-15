@@ -1449,9 +1449,6 @@ class TestZeroQuantityIntegration:
         assert category.middle_price() == expected
 
 
-from src.class_product import ZeroQuantityError
-
-
 class TestZeroQuantityError:
     """Тесты для исключения ZeroQuantityError"""
 

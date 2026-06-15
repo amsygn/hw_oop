@@ -2,6 +2,7 @@ from typing import List
 from abc import ABC, abstractmethod
 from src.class_product import Product, ZeroQuantityError
 
+
 class BaseCategory(ABC):
     """Абстрактный базовый класс для категорий и заказов."""
 
@@ -58,7 +59,7 @@ class Category(BaseCategory):
             # Затем проверяем количество (Дополнительное задание)
             if product.quantity <= 0:
                 raise ZeroQuantityError(
-                    f"Товар с нулевым количеством не может быть добавлен в категорию"
+                    "Товар с нулевым количеством не может быть добавлен в категорию"
                 )
 
             self.__products.append(product)
