@@ -31,12 +31,6 @@ class TestProduct:
         assert product.price == 0.0
         assert product.quantity == 100
 
-    def test_product_str_method_with_zero_quantity(self):
-        """Тест продукта с нулевым количеством"""
-        product = Product("Out of Stock", "Description", 50.0, 0)
-        expected = "Out of Stock, 50.0 руб. Остаток: 0 шт."
-        assert str(product) == expected
-
     def test_product_with_large_numbers(self):
         """Тест продукта с большими числами"""
         product = Product("Expensive Item", "Luxury", 1_000_000.0, 9999)
@@ -100,8 +94,11 @@ class TestProduct:
     def test_product_add_method_with_zero_quantity(self):
         """Тест сложения продуктов, где один имеет нулевое количество"""
         product_a = Product("Product A", "Desc", 100.0, 10)
-        product_b = Product("Product B", "Desc", 200.0, 0)
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Product("Product B", "Desc", 200.0, 0)
 
+        product_b = Product("Product B", "Desc", 200.0, 1)
+        product_b.quantity = 0
         result = product_a + product_b
         expected = 100 * 10 + 200 * 0
         assert result == expected
@@ -162,7 +159,7 @@ class TestProduct:
         """Тест добавления нескольких продуктов в категорию"""
         category = Category("Empty", "No products", [])
 
-        for i in range(5):
+        for i in range(1, 6):
             product = Product(f"P{i}", f"D{i}", 100.0, i)
             category.add_product(product)
 
@@ -224,14 +221,15 @@ class TestProduct:
         assert str(category) == expected
 
     def test_category_str_method_with_zero_quantity_products(self):
-        """Тест строкового представления категории с продуктами нулевого количества"""
-        product1 = Product("P1", "D1", 100.0, 0)
+        """Тест строкового представления категории с продуктами, у которых количество = 0"""
+        product1 = Product("P1", "D1", 100.0, 1)
+        product1.quantity = 0  # Изменяем количество после создания
         product2 = Product("P2", "D2", 200.0, 5)
         category = Category("Mixed", "Desc", [product1, product2])
-        expected = "Mixed, количество продуктов: 5 шт."  # 0 + 5 = 5
+        expected = "Mixed, количество продуктов: 5 шт."
         assert str(category) == expected
 
-    # Тесты для итератора (дополнительное задание)
+    # Тесты для итератора
 
     def test_category_iterator(self):
         """Тест итератора категории"""
@@ -502,9 +500,8 @@ class TestProductCount:
 
     def test_product_count_after_single_category(self):
         """Тест подсчета продуктов после одной категории"""
-        products = [Product(f"P{i}", f"D{i}", 100.0, i) for i in range(5)]
+        products = [Product(f"P{i}", f"D{i}", 100.0, i + 1) for i in range(5)]
         Category("Cat", "Desc", products)
-
         assert Category.product_count == 5
 
     def test_product_count_after_multiple_categories(self):
@@ -681,9 +678,9 @@ class TestEdgeCases:
 
     def test_large_number_of_products(self):
         """Тест с большим количеством продуктов"""
-        products = [Product(f"P{i}", f"D{i}", float(i), i) for i in range(100)]
+        # Начинаем с 1, чтобы избежать нулевого количества
+        products = [Product(f"P{i}", f"D{i}", float(i + 1), i + 1) for i in range(100)]
         Category("Large Category", "Many products", products)
-
         assert Category.product_count == 100
 
     def test_large_number_of_categories(self):
