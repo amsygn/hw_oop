@@ -27,22 +27,29 @@ class PrintMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Выводит информацию о создании объекта."""
-        # Формируем строку с аргументами для вывода
         if args:
             args_str = ', '.join(repr(arg) for arg in args)
             print(f"{self.__class__.__name__}({args_str})")
-        # НЕ вызываем super().__init__() здесь, чтобы избежать проблем с object
+
+
+class ZeroQuantityError(Exception):
+    """Исключение для товаров с нулевым количеством (дополнительное задание)."""
+    pass
 
 
 class Product(BaseProduct, PrintMixin):
     """Класс, представляющий продукт."""
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+        """Инициализация продукта с проверкой количества."""
+        # Задание 1: проверка на нулевое количество
+        if quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+
         self.name = name
         self.description = description
         self.__price = float(price)
         self.quantity = quantity
-        # Вызываем миксин явно
         PrintMixin.__init__(self, name, description, price, quantity)
 
     @property
@@ -78,7 +85,7 @@ class Product(BaseProduct, PrintMixin):
             raise TypeError(f"Невозможно сложить Product с {type(other).__name__}")
         if not isinstance(other, type(self)):
             raise TypeError(f"Невозможно сложить товары разных классов: "
-                            f"{type(self).__name__} и {type(other).__name__}")
+                           f"{type(self).__name__} и {type(other).__name__}")
         return (self.price * self.quantity) + (other.price * other.quantity)
 
     @classmethod
